@@ -11,6 +11,6 @@ int main(){
     for(int i=0;i<n;i++){
       y=fan();
     }
-    printf("%d",n);
+    printf("%d",y);
     return 0;
 }
