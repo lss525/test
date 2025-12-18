@@ -535,7 +535,7 @@ void Re_ls(const char *path,Options opts,int deep){
    compare_sort(files,count,opts);
 
    if(deep>0){
-      printf("\n%s:\n", path); 
+      printf("\n%s:", path); 
    }
    
    if(opts._long){
@@ -576,7 +576,6 @@ void Re_ls(const char *path,Options opts,int deep){
                printf("%s%-*s%s", color, col_width, files[idx].name, COLOR_RESET);
             }
          }
-         printf("\n");
       }
    }
    
@@ -614,7 +613,6 @@ int main(int argc, char *argv[]) {
          }
          lie_ls(argv[i], opts, 0);
          if (argc - optind > 1 && i < argc - 1) {
-            printf("\n");
          }
       }
    }
