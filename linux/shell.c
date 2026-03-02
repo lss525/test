@@ -25,18 +25,18 @@ void execute_command(char *input) {
     // 创建子进程执行命令
     pid = fork();
     if (pid == 0) {
-
+        // 子进程
         execvp(args[0], args);
-
+        // 如果execvp失败
         perror("execvp failed");
         exit(1);
     } else if (pid > 0) {
- 
+        // 父进程等待子进程结束
         wait(NULL);
     } else {
         perror("fork failed");
     }
-}  
+} 
 
 
 
