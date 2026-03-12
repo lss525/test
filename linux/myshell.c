@@ -3,176 +3,253 @@
 #include<string.h>
 #include<unistd.h>
 #include<sys/wait.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<signal.h>
 
-void zhixing(char **args);
-void guandao(char **args1, char **args2);
-void jiexi(char *line, char **args);
-int zhaoguandao(char **args);
+#define MAX_INPUT 1024
+#define MAX_ARGS 64
+#define MAX_PATH 256
 
-// 执行命令
-void zhixing(char **args){
-    pid_t pid = fork();
-    
-    if(pid == 0){
-        // 子进程
-        if(execvp(args[0], args) == -1){
-            printf("命令找不到: %s\n", args[0]);
+char current_dir[MAX_PATH];
+char prev_dir[MAX_PATH];
+int last_status = 0;
+
+void daoxv(double arr[],int n){
+    for(int i=0;i<n-1;i++){
+        for(int j=0;j<n-1-i;j++){
+            if(arr[j+1]>arr[j]){
+                int temp=arr[j+1];
+                    arr[j+1]=arr[j];
+                    arr[j]=temp;   
+            }
         }
-        exit(0);
-    } else if(pid < 0){
-        printf("创建进程失败\n");
-    } else {
-        // 父进程等待
-        wait(NULL);
     }
 }
 
-// 执行管道命令
-void guandao(char **args1, char **args2){
-    int fd[2];
-    pid_t pid1, pid2;
-    
-    if(pipe(fd) == -1){
-        printf("创建管道失败\n");
+void handle_signal(int sig){
+    if(sig == SIGINT){
+        printf("\n");
+        printf("myshell> ");
+        fflush(stdout);
+    }
+}
+
+void get_prompt(char *prompt){
+    getcwd(current_dir,sizeof(current_dir));
+    char *home = getenv("HOME");
+    if(home && strncmp(current_dir,home,strlen(home))==0){
+        sprintf(prompt,"~%s$ ",current_dir+strlen(home));
+    }else{
+        sprintf(prompt,"%s$ ",current_dir);
+    }
+}
+
+int parse_input(char *input, char **args){
+    int i=0;
+    char *token = strtok(input," \t\n");
+    while(token && i<MAX_ARGS-1){
+        args[i++] = token;
+        token = strtok(NULL," \t\n");
+    }
+    args[i] = NULL;
+    return i;
+}
+
+void handle_redirection(char **args){
+    for(int i=0; args[i]!=NULL; i++){
+        if(strcmp(args[i],"<")==0){
+            args[i] = NULL;
+            int fd = open(args[i+1], O_RDONLY);
+            if(fd<0){
+                perror("open");
+                return;
+            }
+            dup2(fd, STDIN_FILENO);
+            close(fd);
+        }
+        else if(strcmp(args[i],">")==0){
+            args[i] = NULL;
+            int fd = open(args[i+1], O_WRONLY|O_CREAT|O_TRUNC, 0644);
+            if(fd<0){
+                perror("open");
+                return;
+            }
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+        }
+        else if(strcmp(args[i],">>")==0){
+            args[i] = NULL;
+            int fd = open(args[i+1], O_WRONLY|O_CREAT|O_APPEND, 0644);
+            if(fd<0){
+                perror("open");
+                return;
+            }
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+        }
+    }
+}
+
+int is_builtin(char **args){
+    if(strcmp(args[0],"cd")==0){
+        if(args[1]==NULL || strcmp(args[1],"~")==0){
+            chdir(getenv("HOME"));
+        }else if(strcmp(args[1],"-")==0){
+            if(strlen(prev_dir)>0){
+                printf("%s\n",prev_dir);
+                chdir(prev_dir);
+            }
+        }else{
+            if(chdir(args[1])!=0){
+                perror("cd");
+            }
+        }
+        getcwd(current_dir,sizeof(current_dir));
+        strcpy(prev_dir,current_dir);
+        return 1;
+    }
+    else if(strcmp(args[0],"exit")==0){
+        exit(0);
+    }
+    else if(strcmp(args[0],"pwd")==0){
+        printf("%s\n",current_dir);
+        return 1;
+    }
+    else if(strcmp(args[0],"echo")==0){
+        for(int i=1; args[i]!=NULL; i++){
+            printf("%s ",args[i]);
+        }
+        printf("\n");
+        return 1;
+    }
+    return 0;
+}
+
+void execute_command(char **args){
+    pid_t pid = fork();
+    if(pid<0){
+        perror("fork");
+        return;
+    }
+    if(pid==0){
+        signal(SIGINT,SIG_DFL);
+        handle_redirection(args);
+        execvp(args[0],args);
+        printf("command not found: %s\n",args[0]);
+        exit(1);
+    }else{
+        int status;
+        waitpid(pid,&status,0);
+        last_status = WEXITSTATUS(status);
+    }
+}
+
+void execute_pipe(char *input){
+    char *cmd1 = strtok(input,"|");
+    char *cmd2 = strtok(NULL,"|");
+    if(cmd2==NULL){
+        char *args[MAX_ARGS];
+        parse_input(cmd1,args);
+        execute_command(args);
         return;
     }
     
-    // 第一个命令 ls
-    pid1 = fork();
-    if(pid1 == 0){
-        // 把输出写到管道
-        dup2(fd[1], 1);
-        close(fd[0]);
-        close(fd[1]);
-        
-        if(execvp(args1[0], args1) == -1){
-            printf("命令找不到: %s\n", args1[0]);
-        }
-        exit(0);
+    int pipefd[2];
+    pipe(pipefd);
+    
+    pid_t pid1 = fork();
+    if(pid1==0){
+        dup2(pipefd[1],STDOUT_FILENO);
+        close(pipefd[0]);
+        close(pipefd[1]);
+        char *args[MAX_ARGS];
+        parse_input(cmd1,args);
+        execvp(args[0],args);
+        exit(1);
     }
     
-    // 第二个命令 grep
-    pid2 = fork();
-    if(pid2 == 0){
-        // 从管道读输入
-        dup2(fd[0], 0);
-        close(fd[1]);
-        close(fd[0]);
-        
-        if(execvp(args2[0], args2) == -1){
-            printf("命令找不到: %s\n", args2[0]);
-        }
-        exit(0);
+    pid_t pid2 = fork();
+    if(pid2==0){
+        dup2(pipefd[0],STDIN_FILENO);
+        close(pipefd[0]);
+        close(pipefd[1]);
+        char *args[MAX_ARGS];
+        parse_input(cmd2,args);
+        execvp(args[0],args);
+        exit(1);
     }
     
-    // 父进程关管道
-    close(fd[0]);
-    close(fd[1]);
-    
-    // 等两个子进程
-    waitpid(pid1, NULL, 0);
-    waitpid(pid2, NULL, 0);
+    close(pipefd[0]);
+    close(pipefd[1]);
+    waitpid(pid1,NULL,0);
+    waitpid(pid2,NULL,0);
 }
 
-// 解析输入
-void jiexi(char *line, char **args){
-    int i = 0;
-    char *token = strtok(line, " \t\n");
-    
-    while(token != NULL && i < 99){
-        args[i] = token;
-        i++;
-        token = strtok(NULL, " \t\n");
+int has_pipe(char *input){
+    for(int i=0; input[i]; i++){
+        if(input[i]=='|') return 1;
     }
-    args[i] = NULL;
+    return 0;
 }
 
-// 找管道符号
-int zhaoguandao(char **args){
-    int i = 0;
-    while(args[i] != NULL){
-        if(strcmp(args[i], "|") == 0){
-            return i;
+int has_ampersand(char **args){
+    for(int i=0; args[i]!=NULL; i++){
+        if(strcmp(args[i],"&")==0){
+            args[i] = NULL;
+            return 1;
         }
-        i++;
     }
-    return -1;
+    return 0;
 }
 
 int main(){
-    char line[1024];
-    char *args[100];
-    char cwd[1024];
-    int i, pos;
+    char input[MAX_INPUT];
+    char *args[MAX_ARGS];
+    char prompt[256];
     
-    printf("我的小shell，输入exit退出\n");
-    printf("试试: ls -l | grep .c\n");
+    getcwd(current_dir,sizeof(current_dir));
+    strcpy(prev_dir,current_dir);
+    
+    signal(SIGINT,handle_signal);
     
     while(1){
-        // 显示当前目录
-        getcwd(cwd, sizeof(cwd));
-        printf("%s $ ", cwd);
+        get_prompt(prompt);
+        printf("%s",prompt);
+        fflush(stdout);
         
-        // 读输入
-        if(fgets(line, sizeof(line), stdin) == NULL){
+        if(fgets(input,sizeof(input),stdin)==NULL){
+            printf("\n");
             break;
         }
         
-        // 去换行
-        line[strlen(line)-1] = '\0';
+        input[strcspn(input,"\n")] = 0;
+        if(strlen(input)==0) continue;
         
-        // 空命令继续
-        if(strlen(line) == 0){
-            continue;
-        }
-        
-        // 解析命令
-        jiexi(line, args);
-        
-        // 处理exit
-        if(strcmp(args[0], "exit") == 0){
-            printf("拜拜\n");
-            break;
-        }
-        
-        // 处理cd
-        if(strcmp(args[0], "cd") == 0){
-            if(args[1] == NULL){
-                chdir(getenv("HOME"));
-            } else {
-                if(chdir(args[1]) != 0){
-                    printf("目录不存在\n");
+        if(has_pipe(input)){
+            char input_copy[MAX_INPUT];
+            strcpy(input_copy,input);
+            execute_pipe(input_copy);
+        }else{
+            int argc = parse_input(input,args);
+            if(argc==0) continue;
+            
+            if(is_builtin(args)) continue;
+            
+            int bg = has_ampersand(args);
+            if(bg){
+                pid_t pid = fork();
+                if(pid==0){
+                    execute_command(args);
+                    exit(0);
+                }else{
+                    printf("[%d]\n",pid);
                 }
+            }else{
+                execute_command(args);
             }
-            continue;
-        }
-        
-        // 找管道
-        pos = zhaoguandao(args);
-        if(pos > 0){
-            // 有管道，分成两个命令
-            char *args1[100];
-            char *args2[100];
-            
-            // 第一个命令
-            for(i = 0; i < pos; i++){
-                args1[i] = args[i];
-            }
-            args1[i] = NULL;
-            
-            // 第二个命令
-            for(i = pos + 1; args[i] != NULL; i++){
-                args2[i - pos - 1] = args[i];
-            }
-            args2[i - pos - 1] = NULL;
-            
-            // 执行管道
-            guandao(args1, args2);
-        } else {
-            // 没管道直接执行
-            zhixing(args);
         }
     }
-    
     return 0;
 }
