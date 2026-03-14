@@ -8,248 +8,423 @@
 #include<fcntl.h>
 #include<signal.h>
 
-#define MAX_INPUT 1024
-#define MAX_ARGS 64
-#define MAX_PATH 256
+char dangqianmulu[1024];
+char shangcimulu[1024];
+int youmeiyouhoutai;
 
-char current_dir[MAX_PATH];
-char prev_dir[MAX_PATH];
-int last_status = 0;
-
-void daoxv(double arr[],int n){
-    for(int i=0;i<n-1;i++){
-        for(int j=0;j<n-1-i;j++){
-            if(arr[j+1]>arr[j]){
-                int temp=arr[j+1];
-                    arr[j+1]=arr[j];
-                    arr[j]=temp;   
-            }
-        }
-    }
-}
-
-void handle_signal(int sig){
-    if(sig == SIGINT){
+// 处理ctrl+c
+void chuliCTRLC(int xinhao){
+    if(xinhao == SIGINT){
         printf("\n");
-        printf("myshell> ");
+        printf("%s $ ", dangqianmulu);
         fflush(stdout);
     }
 }
 
-void get_prompt(char *prompt){
-    getcwd(current_dir,sizeof(current_dir));
-    char *home = getenv("HOME");
-    if(home && strncmp(current_dir,home,strlen(home))==0){
-        sprintf(prompt,"~%s$ ",current_dir+strlen(home));
-    }else{
-        sprintf(prompt,"%s$ ",current_dir);
-    }
-}
-
-int parse_input(char *input, char **args){
-    int i=0;
-    char *token = strtok(input," \t\n");
-    while(token && i<MAX_ARGS-1){
-        args[i++] = token;
-        token = strtok(NULL," \t\n");
-    }
-    args[i] = NULL;
-    return i;
-}
-
-void handle_redirection(char **args){
-    for(int i=0; args[i]!=NULL; i++){
-        if(strcmp(args[i],"<")==0){
-            args[i] = NULL;
-            int fd = open(args[i+1], O_RDONLY);
-            if(fd<0){
-                perror("open");
-                return;
-            }
-            dup2(fd, STDIN_FILENO);
-            close(fd);
+// 执行命令
+void zhixing(char **args){
+    pid_t pid = fork();
+    
+    if(pid == 0){
+        // 子进程
+        signal(SIGINT, SIG_DFL);
+        if(execvp(args[0], args) == -1){
+            printf("命令找不到: %s\n", args[0]);
         }
-        else if(strcmp(args[i],">")==0){
-            args[i] = NULL;
-            int fd = open(args[i+1], O_WRONLY|O_CREAT|O_TRUNC, 0644);
-            if(fd<0){
-                perror("open");
-                return;
-            }
-            dup2(fd, STDOUT_FILENO);
-            close(fd);
-        }
-        else if(strcmp(args[i],">>")==0){
-            args[i] = NULL;
-            int fd = open(args[i+1], O_WRONLY|O_CREAT|O_APPEND, 0644);
-            if(fd<0){
-                perror("open");
-                return;
-            }
-            dup2(fd, STDOUT_FILENO);
-            close(fd);
+        exit(0);
+    } 
+    else if(pid < 0){
+        printf("创建进程失败\n");
+    } 
+    else {
+        // 父进程等待
+        if(!youmeiyouhoutai){
+            wait(NULL);
+        } 
+        else {
+            printf("后台运行%d\n", pid);
         }
     }
 }
 
-int is_builtin(char **args){
-    if(strcmp(args[0],"cd")==0){
-        if(args[1]==NULL || strcmp(args[1],"~")==0){
-            chdir(getenv("HOME"));
-        }else if(strcmp(args[1],"-")==0){
-            if(strlen(prev_dir)>0){
-                printf("%s\n",prev_dir);
-                chdir(prev_dir);
-            }
-        }else{
-            if(chdir(args[1])!=0){
-                perror("cd");
-            }
+// 执行重定向
+void chongdingxiang(char **args){
+    int i = 0;
+    int shuru_fd = -1;
+    int shuchu_fd = -1;
+    int zhuijia = 0;
+    char *shuru_wenjian = NULL;
+    char *shuchu_wenjian = NULL;
+    
+    while(args[i] != NULL){
+        if(strcmp(args[i], "<") == 0){
+            args[i] = NULL;
+            shuru_wenjian = args[i+1];
+            i++;
+        } 
+        else if(strcmp(args[i], ">") == 0){
+            args[i] = NULL;
+            shuchu_wenjian = args[i+1];
+            zhuijia = 0;
+            i++;
+        } 
+        else if(strcmp(args[i], ">>") == 0){
+            args[i] = NULL;
+            shuchu_wenjian = args[i+1];
+            zhuijia = 1;
+            i++;
         }
-        getcwd(current_dir,sizeof(current_dir));
-        strcpy(prev_dir,current_dir);
-        return 1;
+        i++;
     }
-    else if(strcmp(args[0],"exit")==0){
+    
+    pid_t pid = fork();
+    if(pid == 0){
+        if(shuru_wenjian != NULL){
+            shuru_fd = open(shuru_wenjian, O_RDONLY);
+            if(shuru_fd < 0){
+                printf("打开文件失败: %s\n", shuru_wenjian);
+                exit(1);
+            }
+            dup2(shuru_fd, 0);
+            close(shuru_fd);
+        }
+        
+        if(shuchu_wenjian != NULL){
+            if(zhuijia){
+                shuchu_fd = open(shuchu_wenjian, O_WRONLY|O_CREAT|O_APPEND, 0644);
+            } 
+            else {
+                shuchu_fd = open(shuchu_wenjian, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+            }
+            if(shuchu_fd < 0){
+                printf("创建文件失败: %s\n", shuchu_wenjian);
+                exit(1);
+            }
+            dup2(shuchu_fd, 1);
+            close(shuchu_fd);
+        }
+        
+        if(execvp(args[0], args) == -1){
+            printf("命令找不到: %s\n", args[0]);
+        }
+        exit(0);
+    } 
+    else if(pid < 0){
+        printf("创建进程失败\n");
+    } 
+    else {
+        if(!youmeiyouhoutai){
+            wait(NULL);
+        } 
+        else {
+           
+            printf("[后台运行] %d\n", pid);
+        }
+    }
+}
+
+// 执行管道
+void guandao(char **args1, char **args2){
+    int fd[2];
+    pid_t pid1, pid2;
+    
+    if(pipe(fd) == -1){
+        printf("创建管道失败\n");
+        return;
+    }
+    
+    pid1 = fork();
+    if(pid1 == 0){
+        dup2(fd[1], 1);
+        close(fd[0]);
+        close(fd[1]);
+        
+        if(execvp(args1[0], args1) == -1){
+            printf("命令找不到: %s\n", args1[0]);
+        }
         exit(0);
     }
-    else if(strcmp(args[0],"pwd")==0){
-        printf("%s\n",current_dir);
-        return 1;
-    }
-    else if(strcmp(args[0],"echo")==0){
-        for(int i=1; args[i]!=NULL; i++){
-            printf("%s ",args[i]);
+    
+    pid2 = fork();
+    if(pid2 == 0){
+        dup2(fd[0], 0);
+        close(fd[1]);
+        close(fd[0]);
+        
+        if(execvp(args2[0], args2) == -1){
+            printf("命令找不到: %s\n", args2[0]);
         }
-        printf("\n");
+        exit(0);
+    }
+    
+    close(fd[0]);
+    close(fd[1]);
+    
+    waitpid(pid1, NULL, 0);
+    waitpid(pid2, NULL, 0);
+}
+
+// 执行带管道的重定向
+void guandaochongdingxiang(char **args1, char **args2, 
+                           char *shuru_wenjian, char *shuchu_wenjian, int zhuijia){
+    int fd[2];
+    int shuru_fd = -1;
+    int shuchu_fd = -1;
+    pid_t pid1, pid2;
+    
+    if(pipe(fd) == -1){
+        printf("创建管道失败\n");
+        return;
+    }
+    
+    pid1 = fork();
+    if(pid1 == 0){
+        if(shuru_wenjian != NULL){
+            shuru_fd = open(shuru_wenjian, O_RDONLY);
+            if(shuru_fd < 0){
+                printf("打开文件失败: %s\n", shuru_wenjian);
+                exit(1);
+            }
+            dup2(shuru_fd, 0);
+            close(shuru_fd);
+        }
+        
+        dup2(fd[1], 1);
+        close(fd[0]);
+        close(fd[1]);
+        
+        if(execvp(args1[0], args1) == -1){
+            printf("命令找不到: %s\n", args1[0]);
+        }
+        exit(0);
+    }
+    
+    pid2 = fork();
+    if(pid2 == 0){
+        dup2(fd[0], 0);
+        close(fd[1]);
+        close(fd[0]);
+        
+        if(shuchu_wenjian != NULL){
+            if(zhuijia){
+                shuchu_fd = open(shuchu_wenjian, O_WRONLY|O_CREAT|O_APPEND, 0644);
+            } 
+            else {
+                shuchu_fd = open(shuchu_wenjian, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+            }
+            if(shuchu_fd < 0){
+                printf("创建文件失败: %s\n", shuchu_wenjian);
+                exit(1);
+            }
+            dup2(shuchu_fd, 1);
+            close(shuchu_fd);
+        }
+        
+        if(execvp(args2[0], args2) == -1){
+            printf("命令找不到: %s\n", args2[0]);
+        }
+        exit(0);
+    }
+    
+    close(fd[0]);
+    close(fd[1]);
+    
+    waitpid(pid1, NULL, 0);
+    waitpid(pid2, NULL, 0);
+}
+
+// 解析输入
+void jiexi(char *line, char **args){
+    int i = 0;
+    char *token = strtok(line, " \t\n");
+    
+    while(token != NULL && i < 99){
+        args[i] = token;
+        i++;
+        token = strtok(NULL, " \t\n");
+    }
+    args[i] = NULL;
+}
+
+// 找管道符号
+int zhaoguandao(char **args){
+    int i = 0;
+    while(args[i] != NULL){
+        if(strcmp(args[i], "|") == 0){
+            return i;
+        }
+        i++;
+    }
+    return -1;
+}
+
+// 找重定向符号
+int zhaochongdingxiang(char **args, char **shuru, char **shuchu, int *zhuijia){
+    int i = 0;
+    *shuru = NULL;
+    *shuchu = NULL;
+    *zhuijia = 0;
+    
+    while(args[i] != NULL){
+        if(strcmp(args[i], "<") == 0){
+            args[i] = NULL;
+            if(args[i+1] != NULL){
+                *shuru = args[i+1];
+            }
+            i++;
+        } 
+        else if(strcmp(args[i], ">") == 0){
+            args[i] = NULL;
+            if(args[i+1] != NULL){
+                *shuchu = args[i+1];
+                *zhuijia = 0;
+            }
+            i++;
+        } 
+        else if(strcmp(args[i], ">>") == 0){
+            args[i] = NULL;
+            if(args[i+1] != NULL){
+                *shuchu = args[i+1];
+                *zhuijia = 1;
+            }
+            i++;
+        }
+        i++;
+    }
+    
+    if(*shuru != NULL || *shuchu != NULL){
         return 1;
     }
     return 0;
 }
 
-void execute_command(char **args){
-    pid_t pid = fork();
-    if(pid<0){
-        perror("fork");
-        return;
-    }
-    if(pid==0){
-        signal(SIGINT,SIG_DFL);
-        handle_redirection(args);
-        execvp(args[0],args);
-        printf("command not found: %s\n",args[0]);
-        exit(1);
-    }else{
-        int status;
-        waitpid(pid,&status,0);
-        last_status = WEXITSTATUS(status);
-    }
-}
-
-void execute_pipe(char *input){
-    char *cmd1 = strtok(input,"|");
-    char *cmd2 = strtok(NULL,"|");
-    if(cmd2==NULL){
-        char *args[MAX_ARGS];
-        parse_input(cmd1,args);
-        execute_command(args);
-        return;
-    }
-    
-    int pipefd[2];
-    pipe(pipefd);
-    
-    pid_t pid1 = fork();
-    if(pid1==0){
-        dup2(pipefd[1],STDOUT_FILENO);
-        close(pipefd[0]);
-        close(pipefd[1]);
-        char *args[MAX_ARGS];
-        parse_input(cmd1,args);
-        execvp(args[0],args);
-        exit(1);
-    }
-    
-    pid_t pid2 = fork();
-    if(pid2==0){
-        dup2(pipefd[0],STDIN_FILENO);
-        close(pipefd[0]);
-        close(pipefd[1]);
-        char *args[MAX_ARGS];
-        parse_input(cmd2,args);
-        execvp(args[0],args);
-        exit(1);
-    }
-    
-    close(pipefd[0]);
-    close(pipefd[1]);
-    waitpid(pid1,NULL,0);
-    waitpid(pid2,NULL,0);
-}
-
-int has_pipe(char *input){
-    for(int i=0; input[i]; i++){
-        if(input[i]=='|') return 1;
-    }
-    return 0;
-}
-
-int has_ampersand(char **args){
-    for(int i=0; args[i]!=NULL; i++){
-        if(strcmp(args[i],"&")==0){
+// 找后台符号
+int zhaohoutai(char **args){
+    int i = 0;
+    while(args[i] != NULL){
+        if(strcmp(args[i], "&") == 0){
             args[i] = NULL;
             return 1;
         }
+        i++;
     }
     return 0;
 }
 
 int main(){
-    char input[MAX_INPUT];
-    char *args[MAX_ARGS];
-    char prompt[256];
+    char line[4096];
+    char *args[100];
+    char *args1[100];
+    char *args2[100];
+    char cwd[1024];
+    int i, pos, youmeiyouzhongdingxiang;
+    char *shuru_wenjian, *shuchu_wenjian;
+    int zhuijia;
     
-    getcwd(current_dir,sizeof(current_dir));
-    strcpy(prev_dir,current_dir);
+    getcwd(dangqianmulu, sizeof(dangqianmulu));
+    strcpy(shangcimulu, dangqianmulu);
     
-    signal(SIGINT,handle_signal);
+    signal(SIGINT, chuliCTRLC);
+    
+
+    printf("   我的shell\n");
+    printf("支持: 管道 |  重定向 < > >>  后台运行 &\n");
     
     while(1){
-        get_prompt(prompt);
-        printf("%s",prompt);
+        getcwd(dangqianmulu, sizeof(dangqianmulu));
+        printf("%s $ ", dangqianmulu);
         fflush(stdout);
         
-        if(fgets(input,sizeof(input),stdin)==NULL){
+        if(fgets(line, sizeof(line), stdin) == NULL){
             printf("\n");
             break;
         }
         
-        input[strcspn(input,"\n")] = 0;
-        if(strlen(input)==0) continue;
+        line[strlen(line)-1] = '\0';
         
-        if(has_pipe(input)){
-            char input_copy[MAX_INPUT];
-            strcpy(input_copy,input);
-            execute_pipe(input_copy);
-        }else{
-            int argc = parse_input(input,args);
-            if(argc==0) continue;
-            
-            if(is_builtin(args)) continue;
-            
-            int bg = has_ampersand(args);
-            if(bg){
-                pid_t pid = fork();
-                if(pid==0){
-                    execute_command(args);
-                    exit(0);
-                }else{
-                    printf("[%d]\n",pid);
+        if(strlen(line) == 0){
+            continue;
+        }
+        
+        jiexi(line, args);
+        
+        if(strcmp(args[0], "exit") == 0){
+            printf("拜\n");
+            break;
+        }
+        
+        if(strcmp(args[0], "cd") == 0){
+            if(args[1] == NULL || strcmp(args[1], "~") == 0){
+                chdir(getenv("HOME"));
+            } else if(strcmp(args[1], "-") == 0){
+                if(strlen(shangcimulu) > 0){
+                    printf("%s\n", shangcimulu);
+                    chdir(shangcimulu);
+                } else {
+                    printf("没有上一个目录\n");
                 }
-            }else{
-                execute_command(args);
+            } else {
+                if(chdir(args[1]) != 0){
+                    printf("目录不存在: %s\n", args[1]);
+                }
+            }
+            getcwd(dangqianmulu, sizeof(dangqianmulu));
+            strcpy(shangcimulu, dangqianmulu);
+            continue;
+        }
+        
+        if(strcmp(args[0], "pwd") == 0){
+            printf("%s\n", dangqianmulu);
+            continue;
+        }
+        
+        if(strcmp(args[0], "echo") == 0){
+            for(i = 1; args[i] != NULL; i++){
+                printf("%s ", args[i]);
+            }
+            printf("\n");
+            continue;
+        }
+        
+        youmeiyouhoutai = zhaohoutai(args);
+        
+        pos = zhaoguandao(args);
+        if(pos > 0){
+            for(i = 0; i < pos; i++){
+                args1[i] = args[i];
+            }
+            args1[i] = NULL;
+            
+            for(i = pos + 1; args[i] != NULL; i++){
+                args2[i - pos - 1] = args[i];
+            }
+            args2[i - pos - 1] = NULL;
+            
+            // 检查第一个命令有没有重定向
+            char *shuru1, *shuchu1;
+            int zhuijia1;
+            int you1 = zhaochongdingxiang(args1, &shuru1, &shuchu1, &zhuijia1);
+            
+            // 检查第二个命令有没有重定向
+            char *shuru2, *shuchu2;
+            int zhuijia2;
+            int you2 = zhaochongdingxiang(args2, &shuru2, &shuchu2, &zhuijia2);
+            
+            if(you1 || you2){
+                guandaochongdingxiang(args1, args2, shuru1, shuchu2, zhuijia2);
+            } else {
+                guandao(args1, args2);
+            }
+        } else {
+            youmeiyouzhongdingxiang = zhaochongdingxiang(args, &shuru_wenjian, 
+                                                         &shuchu_wenjian, &zhuijia);
+            if(youmeiyouzhongdingxiang){
+                chongdingxiang(args);
+            } else {
+                zhixing(args);
             }
         }
     }
+    
     return 0;
 }
