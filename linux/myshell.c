@@ -137,10 +137,9 @@ void guandao(char **a1, char **a2){
         }
         exit(0);
     }
-    
     p2 = fork();
     if(p2 == 0){
-        dup2(p[0], 0);
+        dup2(p[0],0);
         close(p[1]);
         close(p[0]);
         
