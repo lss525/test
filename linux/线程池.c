@@ -143,7 +143,7 @@ void moren(int task_id,juzheng *jg,double sj){
 void* gongzuo(void *cs) {
     task *rw;
     struct timeval ks, js;  
-           
+    double sc;             
     
     while(yx||geshu>0){
         rw=huoqu();
@@ -161,7 +161,10 @@ void* gongzuo(void *cs) {
         rw->task_end = chengfa(rw->a, rw->b);
         gettimeofday(&js, NULL);
         
-    
+        if(rw->huidiao!=NULL){
+            rw->huidiao(rw->task_id, rw->task_end, sc);
+        }
+        
         shifang(rw->a);
         shifang(rw->b);
         if(rw->task_end!=NULL){
@@ -195,7 +198,6 @@ int tijiao(juzheng *a, juzheng *b, void (*hd)(int, juzheng*, double)) {
     rw->task_time = 0.0;
     rw->huidiao = hd;
     tianjia(rw);
-    printf("rw%d提交\n", rw->task_id);
     return rw->task_id;
 }
 
@@ -223,7 +225,7 @@ void xiangxi(int task_id, juzheng *jg, double sj) {
     
     fprintf(wj, "rw%d完成", task_id);
     if(jg != NULL){
-        for(i = 0; i < jg->rows; i++){
+        for( i = 0; i < jg->rows; i++){
             for(j = 0; j < jg->cols; j++){
                 he += jg->date[i][j];
             }
