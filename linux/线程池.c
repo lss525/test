@@ -96,6 +96,7 @@ juzheng*chengfa(juzheng *a,juzheng *b){
             jg->date[i][j]=he;
         }
     }
+    return jg;
 }
 
 void tianjia(task *rw){
@@ -120,7 +121,7 @@ task* huoqu(){
     rw=duilie[duiqian];
     duiqian=(duiqian+1)%MAX_QUEUE;
     geshu--;
-    pthread_mutex_unlock;
+    pthread_mutex_unlock(&suo);
     return rw;
 }
 
@@ -142,7 +143,7 @@ void moren(int task_id,juzheng *jg,double sj){
 void* gongzuo(void *cs) {
     task *rw;
     struct timeval ks, js;  
-    double sc;             
+           
     
     while(yx||geshu>0){
         rw=huoqu();
@@ -160,14 +161,7 @@ void* gongzuo(void *cs) {
         rw->task_end = chengfa(rw->a, rw->b);
         gettimeofday(&js, NULL);
         
-        sc=(js.tv_sec-ks.tv_sec) * 1000.0;
-        sc+=(js.tv_usec-ks.tv_usec) / 1000.0;
-        rw->task_time = sc;
-        
-        if(rw->huidiao!=NULL){
-            rw->huidiao(rw->task_id, rw->task_end, sc);
-        }
-        
+    
         shifang(rw->a);
         shifang(rw->b);
         if(rw->task_end!=NULL){
@@ -183,14 +177,13 @@ void* gongzuo(void *cs) {
     return NULL;
 }
 
-void chushi(int shu) {
+void chushi(int shu){
     int i;
-    for(i = 0; i < shu; i++){
-        pthread_create(&xc[i], NULL, gongzuo, NULL);
-        printf("线程 %d\n", i + 1);
+    for(i=0;i<shu;i++){
+        pthread_create(&xc[i],NULL,gongzuo,NULL);
+        printf("creat线程%d\n",i+1);
     }
 }
-
 
 int tijiao(juzheng *a, juzheng *b, void (*hd)(int, juzheng*, double)) {
     task *rw;
@@ -202,22 +195,8 @@ int tijiao(juzheng *a, juzheng *b, void (*hd)(int, juzheng*, double)) {
     rw->task_time = 0.0;
     rw->huidiao = hd;
     tianjia(rw);
-    printf("任务 %d 已提交\n", rw->task_id);
+    printf("rw%d提交\n", rw->task_id);
     return rw->task_id;
-}
-
-
-void xianshi() {
-    pthread_mutex_lock(&suo);
-    printf("队列: %d, 执行中: %d, 已完成: %d\n", geshu, huodong, wc);
-    pthread_mutex_unlock(&suo);
-}
-
-
-void dengdai() {
-    while(geshu > 0 || huodong > 0){
-        usleep(100000);
-    }
 }
 
 
@@ -228,7 +207,7 @@ void guanbi(int shu) {
     for(i = 0; i < shu; i++){
         pthread_join(xc[i], NULL);
     }
-    printf("线程池已关闭，共完成 %d 个任务\n", wc);
+    printf("完成%d\n", wc);
 }
 
 
@@ -242,7 +221,7 @@ void xiangxi(int task_id, juzheng *jg, double sj) {
         return;
     }
     
-    fprintf(wj, "任务 %d 完成，耗时: %.2f ms\n", task_id, sj);
+    fprintf(wj, "rw%d完成", task_id);
     if(jg != NULL){
         for(i = 0; i < jg->rows; i++){
             for(j = 0; j < jg->cols; j++){
@@ -253,6 +232,7 @@ void xiangxi(int task_id, juzheng *jg, double sj) {
     }
     fclose(wj);
 }
+
 int main(){
     int i;
     int cc[]={50,100,150};
@@ -266,13 +246,11 @@ int main(){
         fclose(wj);
     }
     
-  
     chushi(xcshu);
     printf("\n");
     
-
     for(i=0; i < rwshu; i++){
-        int dx=cc[rand() % 3];  // 大小 (daxiao=6字母)
+        int dx=cc[rand() % 3];  
         a=suiji(dx, dx);
         b=suiji(dx, dx);
         if(i % 2==0){
@@ -280,23 +258,18 @@ int main(){
         } else {
             tijiao(a, b, moren);
         }
-        usleep(50000);
     }
     
     printf("\n");
     sleep(1);
-    
-    // 显示状态
-    for(i = 0; i < 5; i++){
-        xianshi();
+        for(i = 0; i < 5; i++){
         sleep(1);
     }
     
-    dengdai();
-    
-    // 关闭
+
     guanbi(xcshu);
     
     printf("\n结束\n");
     return 0;
 }
+
