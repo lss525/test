@@ -20,6 +20,13 @@
 int fuwu_sock=-1;
 int yunxing=1;
 
+void xinhao_chuli(int xh){
+    yunxing=0;
+    if(fuwu_sock>=0){
+        close(fuwu_sock);
+        fuwu_sock=-1;
+    }
+}
 int main(int argc,char*argv[]){
     signal(SIGINT,xinhao_chuli);
     signal(SIGTERM,xinhao_chuli);
