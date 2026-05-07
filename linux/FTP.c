@@ -29,13 +29,17 @@ void xinhao_chuli(int xh){
 }
 
 int main(int argc,char*argv[]){
+
     signal(SIGINT,xinhao_chuli);
     signal(SIGTERM,xinhao_chuli);
     signal(SIGPIPE,SIG_IGN);
+
     int dk=DK;
     if(argc>1)dk=atoi(argv[1]);
+
     //根目录
     mkdir(GENMULU,0755);
+
     char fp[512];
     snprintf(fp,sizeof(fp),"%s/welcome.txt",GENMULU);
     FILE*f=fopen(fp,"w");
@@ -54,7 +58,8 @@ int main(int argc,char*argv[]){
         perror("socket");
         return 1;
     }
+    
     int opt=1;
     setsockopt(fuwu_sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
-    
+
 }
