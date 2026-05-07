@@ -55,5 +55,6 @@ int main(int argc,char*argv[]){
         return 1;
     }
     int opt=1;
-    setsockopt
+    setsockopt(fuwu_sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
+    
 }
