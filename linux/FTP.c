@@ -13,6 +13,7 @@
 #include <time.h>
 #include <ctype.h>
 
+
 #define DK 2100
 #define HCHANG 1024
 #define GENMULU "/tmp/ftp_root"
@@ -58,7 +59,7 @@ int main(int argc,char*argv[]){
         perror("socket");
         return 1;
     }
-    
+
     int opt=1;
     setsockopt(fuwu_sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
 
