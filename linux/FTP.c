@@ -39,8 +39,21 @@ int main(int argc,char*argv[]){
     char fp[512];
     snprintf(fp,sizeof(fp),"%s/welcome.txt",GENMULU);
     FILE*f=fopen(fp,"w");
+    if(f){
+        fclose(f);
+    }
+    snprintf(fp,sizeof(fp),"%s/test.txt",GENMULU);
+    fopen(fp,"w");
+    if(f){
+        fclose(f);
+    }
     
     //socket
-    //
-
+    fuwu_sock=socket(AF_INET,SOCK_STREAM,0);
+    if(fuwu_sock<0){
+        perror("socket");
+        return 1;
+    }
+    int opt=1;
+    setsockopt
 }
