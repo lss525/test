@@ -62,6 +62,7 @@ int main(int argc,char*argv[]){
 
     int opt=1;
     setsockopt(fuwu_sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
+
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
@@ -78,10 +79,12 @@ int main(int argc,char*argv[]){
         return 1;
 
     }
+
+
     printf("duankou:%d\n",dk);
     printf("%s\n",GENMULU);
     jieshu_lianjie(NULL);
     close(fuwu_sock);
     return 0;
-    
+
 }
