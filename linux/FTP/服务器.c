@@ -74,7 +74,7 @@ int main(int argc,char*argv[]){
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(dk);
-    
+
     if(bind(fuwu_sock,(struct sockaddr*)&addr,sizeof(ddr))<0){
         perror("bind");
         close(fuwu_sock);
@@ -87,11 +87,12 @@ int main(int argc,char*argv[]){
 
     }
 
-
     printf("duankou:%d\n",dk);
     printf("%s\n",GENMULU);
+
     jieshu_lianjie(NULL);
     close(fuwu_sock);
+    
     return 0;
 
 }
