@@ -28,6 +28,11 @@ void xinhao_chuli(int xh){
         fuwu_sock=-1;
     }
 }
+void* jieshu_lianjie(void* aid){
+    
+    return NULL;
+
+}
 
 int main(int argc,char*argv[]){
 
