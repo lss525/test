@@ -72,6 +72,15 @@ int main(int argc,char*argv[]){
         close(fuwu_sock);
         return 1;
     }
-      
-    
+    if(listen(fuwu_sock,10)<0){
+        perror("listen");
+        close(fuwu_sock);
+        return 1;
+
+    }
+    printf("duankou:%d\n",dk);
+    printf("%s\n",GENMULU);
+    jieshu_lianjie(NULL);
+    close(fuwu_sock);
+    return 0;
 }
