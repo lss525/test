@@ -12,5 +12,11 @@ int kongzhi_sock=-1;
 int main(int argc,char*argv[]){
     char* ip="127.0.0.1";
     int dk=2100;
+    if(argc>=2){
+        ip=argv[1];
+    }
+    if(argc>=3){
+        dk=atoi(argv[2]);
+    }
     
 }
