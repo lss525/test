@@ -18,5 +18,11 @@ int main(int argc,char*argv[]){
     if(argc>=3){
         dk=atoi(argv[2]);
     }
+    //socket
+    kongzhi_sock=socket(AF_INET,SOCK_STREAM,0);
+    if(kongzhi_sock<0){
+        perror("socket");
+        return 1;
+    }
     
 }
