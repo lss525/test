@@ -12,10 +12,14 @@
 int kongzhi_sock=-1;
 
 void fasong_ml(const char* geshi,...){
-    
+
     char buf[HCHANG];
     va_list args;
     va_start(args, geshi);
+    vsnprintf(buf,sizeof(buf),geshi,args);
+    va_end(args);
+    send(kongzhi_sock,buf,strlen(buf),0);
+    printf("%s",buf);
 
 }
 int main(int argc,char*argv[]){
