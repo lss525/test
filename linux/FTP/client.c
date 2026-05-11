@@ -12,10 +12,11 @@
 int kongzhi_sock=-1;
 
 void fasong_ml(const char* geshi,...){
+    
     char buf[HCHANG];
     va_list args;
     va_start(args, geshi);
-    
+
 }
 int main(int argc,char*argv[]){
     char* ip="127.0.0.1";
