@@ -30,7 +30,9 @@ void xinhao_chuli(int xh){
 }
 
 void* jieshu_lianjie(void* arg){
+
     while(yunxing){
+        
         struct sockaddr_in ka;
         socklen_t al=sizeof(ka);
 
@@ -46,7 +48,7 @@ void* jieshu_lianjie(void* arg){
         pthread_t tid;
         pthread_create(&tid, NULL, kongzhi_xiancheng, sock_ptr);
         pthread_detach(tid);
-        
+
         printf("creat");
     }
 
