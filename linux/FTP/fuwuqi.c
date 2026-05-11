@@ -33,15 +33,20 @@ void* jieshu_lianjie(void* arg){
     while(yunxing){
         struct sockaddr_in ka;
         socklen_t al=sizeof(ka);
+
         int ks=accept(fuwu_sock,(struct sockaddr*)&ka,&al);
+
         char ip[16];
         inet_ntop(AF_INET, &ka.sin_addr, ip, sizeof(ip));
         printf("link ip%s:%d\n",ntohs(ka.sin_port));
+
         int* sock_ptr=(int*)malloc(sizeof(int));
         *sock_ptr=ks;
+
         pthread_t tid;
         pthread_create(&tid, NULL, kongzhi_xiancheng, sock_ptr);
         pthread_detach(tid);
+        
         printf("creat");
     }
 
