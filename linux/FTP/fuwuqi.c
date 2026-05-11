@@ -75,7 +75,7 @@ int main(int argc,char*argv[]){
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(dk);
 
-    if(bind(fuwu_sock,(struct sockaddr*)&addr,sizeof(ddr))<0){
+    if(bind(fuwu_sock,(struct sockaddr*)&addr,sizeof(addr))<0){
         perror("bind");
         close(fuwu_sock);
         return 1;
