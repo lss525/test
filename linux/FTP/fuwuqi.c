@@ -29,7 +29,12 @@ void xinhao_chuli(int xh){
     }
 }
 
-void* jieshu_lianjie(void* aid){
+void* jieshu_lianjie(void* arg){
+    while(yunxing){
+        struct sockaddr_in ka;
+        socklen_t al=sizeof(ka);
+        
+    }
 
     return NULL;
 
