@@ -1,3 +1,4 @@
+#include <cstdarg>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,13 @@
 #define HCHANG 4096
 
 int kongzhi_sock=-1;
+
+void fasong_ml(const char* geshi,...){
+    char buf[HCHANG];
+    va_list args;
+    va_start(args, geshi);
+    
+}
 int main(int argc,char*argv[]){
     char* ip="127.0.0.1";
     int dk=2100;
@@ -24,5 +32,5 @@ int main(int argc,char*argv[]){
         perror("socket");
         return 1;
     }
-    
+
 }
