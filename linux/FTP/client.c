@@ -22,6 +22,15 @@ void fasong_ml(const char* geshi,...){
     printf("%s",buf);
 
 }
+void jieshou_yd(){
+    char buf[HCHANG];
+    int n=recv(kongzhi_sock,buf,sizeof(buf)-1,0);
+    if(n>0){
+        buf[n]='\0';
+        printf("accept:%s",buf);
+    }
+}
+
 int main(int argc,char*argv[]){
     char* ip="127.0.0.1";
     int dk=2100;
