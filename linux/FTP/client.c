@@ -31,6 +31,10 @@ void jieshou_yd(){
     }
 }
 
+void ml_yd(const char* cmd){
+    fasong_ml("%s\r\n",cmd);
+    jieshou_yd();
+}
 int main(int argc,char*argv[]){
     char* ip="127.0.0.1";
     int dk=2100;
@@ -47,5 +51,5 @@ int main(int argc,char*argv[]){
         return 1;
     }
 
-    
+
 }
