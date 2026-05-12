@@ -41,10 +41,21 @@ int mingling_jieshuP(int sock,char* buf,int len){
     int i=0;
     char ch;
     while(i<len-1&&recv(sock,&ch,1,0)>0){
-        
+        if(ch=='\r'){
+            recv(sock,&ch,1,0);
+            break;
+        }
+        buf[i++]=ch;
     }
+    buf[i]='\0';
+    if(i>0){
+        printf("accept %s\n",buf);
+    }
+    return i;
+
 
 }
+
 void xinhao_chuli(int xh){
     yunxing=0;
     if(fuwu_sock>=0){
