@@ -21,6 +21,30 @@
 int fuwu_sock=-1;
 int yunxing=1;
 
+void daxie(char*str){
+    for(int i=0;str[i];i++){
+        str[i]=toupper(str[i]);
+                         
+    }
+}
+void mingling_fasong(int sock, const char* geshi, ...) {
+    char buf[HCHANG];
+    va_list args;
+    va_start(args, geshi);
+    vsnprintf(buf, sizeof(buf), geshi, args);
+    va_end(args);
+    send(sock, buf, strlen(buf), MSG_NOSIGNAL);
+    printf("[发送] %s", buf);
+}
+
+int mingling_jieshuP(int sock,char* buf,int len){
+    int i=0;
+    char ch;
+    while(i<len-1&&recv(sock,&ch,1,0)>0){
+        
+    }
+
+}
 void xinhao_chuli(int xh){
     yunxing=0;
     if(fuwu_sock>=0){
@@ -32,7 +56,7 @@ void xinhao_chuli(int xh){
 void* jieshu_lianjie(void* arg){
 
     while(yunxing){
-        
+
         struct sockaddr_in ka;
         socklen_t al=sizeof(ka);
 
