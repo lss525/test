@@ -56,6 +56,45 @@ int mingling_jieshuP(int sock,char* buf,int len){
 
 }
 
+void mulu_list(const char* lujing, char* out, int len) {
+    DIR* dir = opendir(lujing);
+    if (!dir) { out[0] = '\0'; return; }
+    
+    int pos = 0;
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+        
+        char fp[512];
+        snprintf(fp, sizeof(fp), "%s/%s", lujing, entry->d_name);
+        
+        struct stat st;
+        stat(fp, &st);
+        
+        char tb[64];
+        strftime(tb, sizeof(tb), "%b %d %H:%M", localtime(&st.st_mtime));
+        
+        char qx[11];
+        qx[0] = S_ISDIR(st.st_mode) ? 'd' : '-';
+        qx[1] = (st.st_mode & S_IRUSR) ? 'r' : '-';
+        qx[2] = (st.st_mode & S_IWUSR) ? 'w' : '-';
+        qx[3] = (st.st_mode & S_IXUSR) ? 'x' : '-';
+        qx[4] = (st.st_mode & S_IRGRP) ? 'r' : '-';
+        qx[5] = (st.st_mode & S_IWGRP) ? 'w' : '-';
+        qx[6] = (st.st_mode & S_IXGRP) ? 'x' : '-';
+        qx[7] = (st.st_mode & S_IROTH) ? 'r' : '-';
+        qx[8] = (st.st_mode & S_IWOTH) ? 'w' : '-';
+        qx[9] = (st.st_mode & S_IXOTH) ? 'x' : '-';
+        qx[10] = '\0';
+        
+        pos += snprintf(out + pos, len - pos, "%s 1 ftp ftp %ld %s %s\r\n",
+                       qx, st.st_size, tb, entry->d_name);
+        if (pos >= len - 1) break;
+    }
+    closedir(dir);
+}
+
 void xinhao_chuli(int xh){
     yunxing=0;
     if(fuwu_sock>=0){
