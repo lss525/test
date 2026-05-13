@@ -12,7 +12,8 @@
 #include <dirent.h>
 #include <time.h>
 #include <ctype.h>
-
+#include <fcntl.h>
+#include <sys/sendfile.h>
 
 #define DK 2100
 #define HCHANG 1024
@@ -109,27 +110,67 @@ void xinhao_chuli(int xh){
     }
 }
 
-void* shuju_chuanshu(void* arg){
-
-    Chuanshu_Canshu* cs=(Chuanshu_Canshu*)arg;
-
-    int kehu_sock=accept(cs->shuju_sock,NULL,NULL);
-
-    if(kehu_sock<0){
-        printf("accept no acchieve");
+void* shuju_chuanshu(void* arg) {
+    Chuanshu_Canshu* cs = (Chuanshu_Canshu*)arg;
+    
+    int kehu_sock = accept(cs->shuju_sock, NULL, NULL);
+    if (kehu_sock < 0) {
         close(cs->shuju_sock);
         free(cs);
         return NULL;
     }
-
-    if(cs->leixing==0){
+    
+    if (cs->leixing == 0) {
         char lb[8192];
-        mulu_list(cs->lujing,lb,sizeof(lb));
-        send(kehu_sock,lb,strlen(lb),MSG_NOSIGNAL);
+        mulu_list(cs->lujing, lb, sizeof(lb));
+        send(kehu_sock, lb, strlen(lb), MSG_NOSIGNAL);
+    }
+
+    else if (cs->leixing == 1) {
+
+        int fd = open(cs->lujing, O_RDONLY);
+
+        if (fd < 0) {
+            printf("nohave");
+            close(kehu_sock);
+            close(cs->shuju_sock);
+            free(cs);
+            return NULL;
+        }
+        
+        struct stat st;
+        fstat(fd, &st);
+        off_t offset = 0;
+        
+        while (offset < st.st_size) {
+            ssize_t n = sendfile(kehu_sock, fd, &offset,
+                                 st.st_size - offset);
+            if (n <= 0) break;
+        }
+        
+        close(fd);
+        printf("[数据传输线程] 文件下载完成(零拷贝): %s (%ld字节)\n",
+               cs->lujing, st.st_size);
+    }
+    else if (cs->leixing == 2) {
+        // STOR：上传（暂不优化，保持原样）
+        FILE* ff = fopen(cs->lujing, "wb");
+        if (ff) {
+            char buf[8192];
+            int n;
+            while ((n = recv(kehu_sock, buf, sizeof(buf), 0)) > 0) {
+                fwrite(buf, 1, n, ff);
+            }
+            fclose(ff);
+            printf("[数据传输线程] 文件上传完成: %s\n", cs->lujing);
+        }
     }
     
-    printf("accept acchievi!");
-    
+    close(kehu_sock);
+    close(cs->shuju_sock);
+    free(cs);
+    printf("[数据传输线程] 结束\n");
+    return NULL;
 }
 
 void* jieshu_lianjie(void* arg){
