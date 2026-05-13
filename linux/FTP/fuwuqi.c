@@ -111,7 +111,7 @@ void xinhao_chuli(int xh){
 }
 
 void* shuju_chuanshu(void* arg) {
-    
+
     Chuanshu_Canshu* cs = (Chuanshu_Canshu*)arg;
     
     int kehu_sock = accept(cs->shuju_sock, NULL, NULL);
@@ -173,6 +173,10 @@ void* shuju_chuanshu(void* arg) {
     return NULL;
 }
 
+void chuli_USER(int sock,char* arg,char* yonghu){
+    strcpy(yonghu,arg);
+
+}
 void* jieshu_lianjie(void* arg){
 
     while(yunxing){
