@@ -111,6 +111,7 @@ void xinhao_chuli(int xh){
 }
 
 void* shuju_chuanshu(void* arg) {
+    
     Chuanshu_Canshu* cs = (Chuanshu_Canshu*)arg;
     
     int kehu_sock = accept(cs->shuju_sock, NULL, NULL);
@@ -149,11 +150,11 @@ void* shuju_chuanshu(void* arg) {
         }
         
         close(fd);
-        printf("[数据传输线程] 文件下载完成(零拷贝): %s (%ld字节)\n",
+        printf("文件下载完成(零拷贝): %s (%ld字节)\n",
                cs->lujing, st.st_size);
     }
+
     else if (cs->leixing == 2) {
-        // STOR：上传（暂不优化，保持原样）
         FILE* ff = fopen(cs->lujing, "wb");
         if (ff) {
             char buf[8192];
@@ -162,14 +163,13 @@ void* shuju_chuanshu(void* arg) {
                 fwrite(buf, 1, n, ff);
             }
             fclose(ff);
-            printf("[数据传输线程] 文件上传完成: %s\n", cs->lujing);
+            printf("文件上传完成: %s\n", cs->lujing);
         }
     }
     
     close(kehu_sock);
     close(cs->shuju_sock);
     free(cs);
-    printf("[数据传输线程] 结束\n");
     return NULL;
 }
 
