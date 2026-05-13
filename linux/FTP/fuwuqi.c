@@ -109,6 +109,22 @@ void xinhao_chuli(int xh){
     }
 }
 
+void* shuju_chuanshu(void* arg){
+
+    Chuanshu_Canshu* cs=(Chuanshu_Canshu*)arg;
+
+    int kehu_sock=accept(cs->shuju_sock,NULL,NULL);
+
+    if(kehu_sock<0){
+        printf("accept no acchieve");
+        close(cs->shuju_sock);
+        free(cs);
+        return NULL;
+    }
+    
+    printf("accept acchievi!");
+    
+}
 
 void* jieshu_lianjie(void* arg){
 
