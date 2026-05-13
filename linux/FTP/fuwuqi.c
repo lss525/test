@@ -121,6 +121,12 @@ void* shuju_chuanshu(void* arg){
         free(cs);
         return NULL;
     }
+
+    if(cs->leixing==0){
+        char lb[8192];
+        mulu_list(cs->lujing,lb,sizeof(lb));
+        send(kehu_sock,lb,strlen(lb),MSG_NOSIGNAL);
+    }
     
     printf("accept acchievi!");
     
