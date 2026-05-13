@@ -50,6 +50,5 @@ int main(int argc,char*argv[]){
         perror("socket");
         return 1;
     }
-
-
+    
 }
