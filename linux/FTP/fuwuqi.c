@@ -21,6 +21,12 @@
 int fuwu_sock=-1;
 int yunxing=1;
 
+typedef struct{
+    int shuju_sock;
+    int leixing;
+    char lujing[512];
+} Chuanshu_Canshu;
+
 void daxie(char*str){
     for(int i=0;str[i];i++){
         str[i]=toupper(str[i]);
@@ -102,6 +108,7 @@ void xinhao_chuli(int xh){
         fuwu_sock=-1;
     }
 }
+
 
 void* jieshu_lianjie(void* arg){
 
