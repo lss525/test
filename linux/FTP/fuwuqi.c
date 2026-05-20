@@ -52,6 +52,7 @@ int mingling_jieshuP(int sock,char* buf,int len){
             recv(sock,&ch,1,0);
             break;
         }
+        
         buf[i++]=ch;
     }
     buf[i]='\0';
