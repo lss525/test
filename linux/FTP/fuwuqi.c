@@ -52,7 +52,7 @@ int mingling_jieshuP(int sock,char* buf,int len){
             recv(sock,&ch,1,0);
             break;
         }
-        
+
         buf[i++]=ch;
     }
     buf[i]='\0';
@@ -151,8 +151,6 @@ void* shuju_chuanshu(void* arg) {
         }
         
         close(fd);
-        printf("文件下载完成(零拷贝): %s (%ld字节)\n",
-               cs->lujing, st.st_size);
     }
 
     else if (cs->leixing == 2) {
@@ -164,7 +162,7 @@ void* shuju_chuanshu(void* arg) {
                 fwrite(buf, 1, n, ff);
             }
             fclose(ff);
-            printf("文件上传完成: %s\n", cs->lujing);
+            printf("%s\n", cs->lujing);
         }
     }
     
@@ -176,10 +174,192 @@ void* shuju_chuanshu(void* arg) {
 
 void chuli_USER(int sock,char* arg,char* yonghu){
     strcpy(yonghu,arg);
+    mingling_fasong(sock,"331,mima、\r\n");
+    
+}
+
+void chuli_PASS(int sock, int* renzheng, char* yonghu, char* arg) {
+    if (strcmp(yonghu, "anonymous") == 0 || 
+        (strcmp(yonghu, "admin") == 0 && strcmp(arg, "admin") == 0)) {
+        *renzheng = 1;
+        mingling_fasong(sock, "230 ok\r\n");
+    } else {
+        mingling_fasong(sock, "530 no\r\n");
+    }
+}
+
+void chuli_PWD(int sock, char* mulu) {
+    mingling_fasong(sock, "257 \"%s\" now mulu\r\n", mulu);
+}
+
+void chuli_CWD(int sock, char* mulu, char* arg) {
+    if (strcmp(arg, "/") == 0) strcpy(mulu, "/");
+    else if (strcmp(arg, "..") == 0) {
+        if (strcmp(mulu, "/") != 0) {
+            char* pos = strrchr(mulu, '/');
+            if (pos == mulu) strcpy(mulu, "/");
+            else *pos = '\0';
+        }
+    } 
+    else {
+        if (strcmp(mulu, "/") == 0) snprintf(mulu, 256, "/%s", arg);
+        else { strcat(mulu, "/"); strcat(mulu, arg); }
+    }
+    mingling_fasong(sock, "250 mulu change\r\n");
+}
+
+void chuli_TYPE(int sock, char* arg) {
+    if (arg[0] == 'A') mingling_fasong(sock, "200 turnA\r\n");
+    else if (arg[0] == 'I') mingling_fasong(sock, "200 turnI\r\n");
+    else mingling_fasong(sock, "504 no zhichi\r\n");
+}
+
+void chuli_QUIT(int sock) {
+    mingling_fasong(sock, "221 by");
+}
+
+int chuli_PASV(int sock, char* fuwu_ip) {
+    int shuju_sock = socket(AF_INET, SOCK_STREAM, 0);
+    
+    int opt = 1;
+    setsockopt(shuju_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = 0;  // 系统分配端口
+    bind(shuju_sock, (struct sockaddr*)&addr, sizeof(addr));
+    
+    socklen_t al = sizeof(addr);
+    getsockname(shuju_sock, (struct sockaddr*)&addr, &al);
+    int dk = ntohs(addr.sin_port);  // 获取分配的端口
+    
+    listen(shuju_sock, 1);
+    
+    int p1 = dk / 256;
+    int p2 = dk % 256;
+    
+    char ip_fmt[32];
+    strcpy(ip_fmt, fuwu_ip);
+    for (int i = 0; ip_fmt[i]; i++)
+        if (ip_fmt[i] == '.') ip_fmt[i] = ',';
+    
+    mingling_fasong(sock, "227 (%s,%d,%d)\r\n", ip_fmt, p1, p2);
+    
+    printf("%d\n", dk);
+    return shuju_sock;  // 返回数据监听 socket
+}
+
+void chuli_LIST(int sock,int shuju_sock,char* mulu){
+    mingling_fasong(sock,"150 open mulu\r\n");
+    Chuanshu_Canshu* cs=(Chuanshu_Canshu*)malloc(sizeof(Chuanshu_Canshu));
+    cs->shuju_sock=shuju_sock;
+    cs->leixing=0;
+    snprintf(cs->lujing,sizeof(cs->lujing),"%s%s",GENMULU,mulu);
+    pthread_t tid;
+    pthread_create(&tid, NULL, shuju_chuanshu, cs);
+    pthread_detach(tid);
+    sleep(1);
+    mingling_fasong(sock,"226 mulu put\r\n");
+
 
 }
-void* jieshu_lianjie(void* arg){
+void chuli_RETR(int sock, int shuju_sock, char* mulu, char* arg){
+    char fp[512];
+    snprintf(fp, sizeof(fp), "%s%s/%s", GENMULU, mulu, arg);
+    FILE* ff=fopen(fp,"rb");
+    fclose(ff);
+    Chuanshu_Canshu* cs=(Chuanshu_Canshu*)malloc(sizeof(Chuanshu_Canshu));
+    cs->shuju_sock=shuju_sock;
+    cs->leixing=1;
+    strcpy(cs->lujing,fp);
+    pthread_t tid;
+    pthread_create(&tid, NULL, shuju_chuanshu, cs);
+    pthread_detach(tid);
+    sleep(1);
+    mingling_fasong(sock,"226 put wancheng\r\n");
 
+}
+
+void chuli_STOR(int sock, int shuju_sock, char* mulu, char* arg){
+    char fp[512];
+    snprintf(fp,sizeof(fp),"%s%s/%s",GENMULU,mulu,arg);
+    mingling_fasong(sock,"150 open fp");
+    Chuanshu_Canshu* cs=(Chuanshu_Canshu*)malloc(sizeof(Chuanshu_Canshu));
+    cs->shuju_sock=shuju_sock;
+    cs->leixing=2;
+    strcpy(cs->lujing,fp);
+    pthread_t tid;
+    pthread_create(&tid, NULL, shuju_chuanshu, cs);
+    pthread_detach(tid);
+    sleep(1);
+    mingling_fasong(sock,"226 put wancheng\r\n");
+
+}
+
+
+void mingling_zhixing(int sock, char* cmd,
+                      char* yonghu, char* mulu, int* renzheng,
+                      int* shuju_sock, char* fuwu_ip) {
+    char ml[32], cs[256];
+    cs[0] = '\0';
+    sscanf(cmd, "%s %[^\n]", ml, cs);
+    daxie(ml);
+    
+    if (strcmp(ml, "USER") == 0) chuli_USER(sock, cs, yonghu);
+    else if (strcmp(ml, "PASS") == 0) chuli_PASS(sock, renzheng, yonghu, cs);
+    else if (strcmp(ml, "PWD") == 0) chuli_PWD(sock, mulu);
+    else if (strcmp(ml, "CWD") == 0) chuli_CWD(sock, mulu, cs);
+    else if (strcmp(ml, "PASV") == 0) {
+        // 先关闭旧的数据 socket
+        if (*shuju_sock >= 0) close(*shuju_sock);
+        *shuju_sock = chuli_PASV(sock, fuwu_ip);
+    }
+    else if (strcmp(ml, "LIST") == 0) chuli_LIST(sock, *shuju_sock, mulu);
+    else if (strcmp(ml, "RETR") == 0) chuli_RETR(sock, *shuju_sock, mulu, cs);
+    else if (strcmp(ml, "STOR") == 0) chuli_STOR(sock, *shuju_sock, mulu, cs);
+    else if (strcmp(ml, "TYPE") == 0) chuli_TYPE(sock, cs);
+    else if (strcmp(ml, "SYST") == 0) mingling_fasong(sock, "215 UNIX Type: L8\r\n");
+    else if (strcmp(ml, "FEAT") == 0) {
+        mingling_fasong(sock, "211-Features:\r\n PASV\r\n UTF8\r\n211 End\r\n");
+    }
+    else if (strcmp(ml, "QUIT") == 0) chuli_QUIT(sock);
+    else mingling_fasong(sock, "502 no achieve\r\n");
+}
+
+void* kongzhi_xiancheng(void* arg){
+    int sock=*(int*)arg;
+    free(arg);
+    char yonghu[64]="";
+    char mulu[512]="/";
+    char fuwu_ip[16]="127.0.0.1";
+    int renzheng=0;
+    int shuju_sock=-1;
+    char buf[HCHANG];
+    printf("%d\n",sock);
+    mingling_fasong(sock,"220 welcome to use ftp");
+    while(1){
+        int n=mingling_jieshuP(sock,buf,sizeof(buf));
+        if(n==0){
+            break;
+        }
+        mingling_zhixing(sock,buf,yonghu,mulu,&renzheng,&shuju_sock,fuwu_ip);
+        if(strncmp(buf,"QUIT",4)==0){
+            break;
+        }
+
+    }
+    if(shuju_sock>=0){
+        close(shuju_sock);
+    }
+    close(sock);
+    printf("jieshu\r\n");
+    return NULL;
+
+
+} 
+void* jieshou_lianjie(void* arg) {
     while(yunxing){
 
         struct sockaddr_in ka;
@@ -189,7 +369,7 @@ void* jieshu_lianjie(void* arg){
 
         char ip[16];
         inet_ntop(AF_INET, &ka.sin_addr, ip, sizeof(ip));
-        printf("link ip%s:%d\n",ntohs(ka.sin_port));
+        printf("link ip%s:%d\n",ip,ntohs(ka.sin_port));
 
         int* sock_ptr=(int*)malloc(sizeof(int));
         *sock_ptr=ks;
@@ -198,7 +378,7 @@ void* jieshu_lianjie(void* arg){
         pthread_create(&tid, NULL, kongzhi_xiancheng, sock_ptr);
         pthread_detach(tid);
 
-        printf("creat");
+        printf("creat\r\n");
     }
 
     return NULL;
@@ -260,7 +440,7 @@ int main(int argc,char*argv[]){
     printf("duankou:%d\n",dk);
     printf("%s\n",GENMULU);
 
-    jieshu_lianjie(NULL);
+    jieshou_lianjie(NULL);
     close(fuwu_sock);
     
     

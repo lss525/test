@@ -62,12 +62,12 @@ int shuju_lianjie(const char* ip, int dk) {
     inet_pton(AF_INET, ip, &addr.sin_addr);
     
     if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        perror("数据连接失败");
+        perror("no link");
         close(sock);
         return -1;
     }
     
-    printf("[数据连接] 已连接 %s:%d\n", ip, dk);
+    printf("already link %s:%d\n", ip, dk);
     return sock;
 }
 
@@ -88,13 +88,13 @@ void liechu_mulu() {
     char yd[HCHANG];
     int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
     yd[n] = '\0';
-    printf("[接收] %s", yd);
+    printf("accept %s", yd);
     
 
     char ip[32];
     int dk;
     if (!jiexi_pasv(yd, ip, &dk)) {
-        printf("解析 PASV 失败\n");
+        printf("no PASV \n");
         return;
     }
         int shuju = shuju_lianjie(ip, dk);
@@ -108,9 +108,8 @@ void liechu_mulu() {
     n = recv(shuju, data, sizeof(data) - 1, 0);
     if (n > 0) {
         data[n] = '\0';
-        printf("\n========== 目录列表 ==========\n");
         printf("%s", data);
-        printf("================================\n\n");
+
     }
     
     close(shuju);
@@ -123,7 +122,7 @@ void xiazai(const char* ming) {
     char yd[HCHANG];
     int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
     yd[n] = '\0';
-    printf("[接收] %s", yd);
+    printf("accept %s", yd);
     
     char ip[32];
     int dk;
@@ -139,7 +138,7 @@ void xiazai(const char* ming) {
 
     FILE* ff = fopen(ming, "wb");
     if (!ff) {
-        printf("无法创建文件: %s\n", ming);
+        printf("do not create file: %s\n", ming);
         close(shuju);
         jieshou_yd();
         return;
@@ -153,7 +152,7 @@ void xiazai(const char* ming) {
     fclose(ff);
     close(shuju);
     
-    printf("文件已下载: %s\n", ming);
+    printf("file already download %s\n", ming);
     jieshou_yd();  // 226
 }
 
@@ -162,7 +161,7 @@ void shangchuan(const char* ming) {
 
     FILE* ff = fopen(ming, "rb");
     if (!ff) {
-        printf("本地文件不存在: %s\n", ming);
+        printf("local file no there: %s\n", ming);
         return;
     }
 
@@ -170,7 +169,7 @@ void shangchuan(const char* ming) {
     char yd[HCHANG];
     int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
     yd[n] = '\0';
-    printf("[接收] %s", yd);
+    printf("accept%s", yd);
     
     char ip[32];
     int dk;
@@ -192,7 +191,7 @@ void shangchuan(const char* ming) {
     fclose(ff);
     close(shuju);
     
-    printf("文件已上传: %s\n", ming);
+    printf("file already upload: %s\n", ming);
     jieshou_yd();  // 226
 }
 
@@ -200,13 +199,13 @@ void shangchuan(const char* ming) {
 void jiaohu() {
     char buf[HCHANG];
     
-    printf("\nFTP 客户端命令:\n");
-    printf("  ls          列出目录\n");
-    printf("  get 文件名   下载文件\n");
-    printf("  put 文件名   上传文件\n");
-    printf("  cd  目录名   切换目录\n");
-    printf("  pwd         当前目录\n");
-    printf("  quit        退出\n\n");
+    printf("\nFTP \n");
+    printf("  ls  \n");
+    printf("  get\n");
+    printf("  put \n");
+    printf("  cd  \n");
+    printf("  pwd \n");
+    printf("  quit \n\n");
     
     while (1) {
         printf("ftp> ");
@@ -235,7 +234,7 @@ void jiaohu() {
             break;
         }
         else {
-            printf("未知命令: %s\n", buf);
+            printf("not know %s\n", buf);
         }
     }
 }
@@ -255,5 +254,31 @@ int main(int argc,char*argv[]){
         perror("socket");
         return 1;
     }
+        struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(dk);
+    inet_pton(AF_INET, ip, &addr.sin_addr);
     
+    if (connect(kongzhi_sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        perror("connect failed");
+        close(kongzhi_sock);
+        return 1;
+    }
+    
+    printf("already link %s:%d\n", ip, dk);
+    
+
+    jieshou_yd();
+    
+
+    denglu("anonymous", "guest");
+    
+
+    jiaohu();
+    
+
+    close(kongzhi_sock);
+    printf("already duankai\n");
+    return 0;
 }
