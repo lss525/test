@@ -141,6 +141,7 @@ void liechu_mulu() {
 
     }
     
+    
     close(shuju);
     pasv_ok = 0;  // ===== 新增：用完端口就失效 =====
     jieshou_yd(); // 226
@@ -248,6 +249,7 @@ void jiaohu() {
     char buf[HCHANG];
     
     printf("\nFTP \n");
+    printf("  user ->\n");
     printf("  pasv  \n");
     printf("  ls  \n");
     printf("  get\n");
@@ -267,6 +269,11 @@ void jiaohu() {
             kaiqi_pasv();                  }
         else if (strncmp(buf, "ls", 2) == 0) {
             liechu_mulu();
+        }
+        else if (strncmp(buf, "user ", 5) == 0) {
+             char yonghu[64] = "", mima[64] = "";
+             sscanf(buf + 5, "%s %s", yonghu, mima);
+            denglu(yonghu, mima);
         }
         else if (strncmp(buf, "get ", 4) == 0) {
             xiazai(buf + 4);
@@ -324,7 +331,6 @@ int main(int argc,char*argv[]){
     jieshou_yd();
     
 
-    denglu("anonymous", "guest");
     
 
     jiaohu();

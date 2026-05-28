@@ -179,11 +179,11 @@ void chuli_USER(int sock,char* arg,char* yonghu){
 }
 
 void chuli_PASS(int sock, int* renzheng, char* yonghu, char* arg) {
-    if (strcmp(yonghu, "anonymous") == 0 || 
-        (strcmp(yonghu, "admin") == 0 && strcmp(arg, "admin") == 0)) {
+    if (strcmp(yonghu, "admin") == 0 && strcmp(arg, "lhy'sftp") == 0) {
         *renzheng = 1;
         mingling_fasong(sock, "230 ok\r\n");
-    } else {
+    } 
+    else {
         mingling_fasong(sock, "530 no\r\n");
     }
 }
