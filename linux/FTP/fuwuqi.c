@@ -249,14 +249,17 @@ int chuli_PASV(int sock, char* fuwu_ip) {
     
     printf("%d\n", dk);
     return shuju_sock;  // 返回数据监听 socket
+
 }
 
 void chuli_LIST(int sock,int shuju_sock,char* mulu){
+
     mingling_fasong(sock,"150 open mulu\r\n");
     Chuanshu_Canshu* cs=(Chuanshu_Canshu*)malloc(sizeof(Chuanshu_Canshu));
     cs->shuju_sock=shuju_sock;
     cs->leixing=0;
     snprintf(cs->lujing,sizeof(cs->lujing),"%s%s",GENMULU,mulu);
+
     pthread_t tid;
     pthread_create(&tid, NULL, shuju_chuanshu, cs);
     pthread_detach(tid);
@@ -265,6 +268,7 @@ void chuli_LIST(int sock,int shuju_sock,char* mulu){
 
 
 }
+
 void chuli_RETR(int sock, int shuju_sock, char* mulu, char* arg){
     char fp[512];
     snprintf(fp, sizeof(fp), "%s%s/%s", GENMULU, mulu, arg);
@@ -290,6 +294,7 @@ void chuli_STOR(int sock, int shuju_sock, char* mulu, char* arg){
     cs->shuju_sock=shuju_sock;
     cs->leixing=2;
     strcpy(cs->lujing,fp);
+
     pthread_t tid;
     pthread_create(&tid, NULL, shuju_chuanshu, cs);
     pthread_detach(tid);
@@ -359,6 +364,7 @@ void* kongzhi_xiancheng(void* arg){
 
 
 } 
+
 void* jieshou_lianjie(void* arg) {
     while(yunxing){
 

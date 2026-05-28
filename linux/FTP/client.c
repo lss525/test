@@ -10,6 +10,11 @@
 
 int kongzhi_sock=-1;
 
+char pasv_ip[32] = "";      // 数据连接的 IP
+int pasv_dk = 0;            // 数据连接的端口
+int pasv_ok = 0;  
+
+
 void fasong_ml(const char* geshi,...){
 
     char buf[HCHANG];
@@ -37,7 +42,7 @@ void ml_yd(const char* cmd){
 
 int jiexi_pasv(const char* yd, char* ip, int* dk) {
     int h1, h2, h3, h4, p1, p2;
-    
+
 
     char* zuo = strchr(yd, '(');
     char* you = strchr(yd, ')');
@@ -81,9 +86,31 @@ void denglu(const char* yonghu, const char* mima) {
 }
 
 
+void kaiqi_pasv() {
+    fasong_ml("PASV\r\n");
+    
+    char yd[HCHANG];
+    int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
+    yd[n] = '\0';
+    printf("accept%s", yd);
+    
+    if (jiexi_pasv(yd, pasv_ip, &pasv_dk)) {
+        pasv_ok = 1;
+        printf("pasv begin %s:%d\n", pasv_ip, pasv_dk);
+    } else {
+        pasv_ok = 0;
+        printf("no pasv\n");
+    }
+}
+
 void liechu_mulu() {
 
-    fasong_ml("PASV\r\n");
+    if (!pasv_ok) {
+        printf("please start pasv\n");
+        return;
+    }
+    
+   
     
     char yd[HCHANG];
     int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
@@ -97,10 +124,12 @@ void liechu_mulu() {
         printf("no PASV \n");
         return;
     }
-        int shuju = shuju_lianjie(ip, dk);
-    if (shuju < 0) return;
-    
 
+    int shuju = shuju_lianjie(pasv_ip, pasv_dk);
+    if (shuju < 0) {
+        pasv_ok = 0;
+        return;
+    }
     fasong_ml("LIST\r\n");
     jieshou_yd();  // 150
     
@@ -113,12 +142,17 @@ void liechu_mulu() {
     }
     
     close(shuju);
-    jieshou_yd();  // 226
+    pasv_ok = 0;  // ===== 新增：用完端口就失效 =====
+    jieshou_yd(); // 226
 }
 
 void xiazai(const char* ming) {
 
-    fasong_ml("PASV\r\n");
+    if (!pasv_ok) {
+        printf("please start pasv\n");
+        return;
+    }
+
     char yd[HCHANG];
     int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
     yd[n] = '\0';
@@ -128,8 +162,11 @@ void xiazai(const char* ming) {
     int dk;
     if (!jiexi_pasv(yd, ip, &dk)) return;
 
-    int shuju = shuju_lianjie(ip, dk);
-    if (shuju < 0) return;
+   int shuju = shuju_lianjie(pasv_ip, pasv_dk);
+    if (shuju < 0) {
+        pasv_ok = 0;
+        return;
+    }
     
 
     fasong_ml("RETR %s\r\n", ming);
@@ -151,13 +188,20 @@ void xiazai(const char* ming) {
     
     fclose(ff);
     close(shuju);
-    
+    pasv_ok = 0;
+
     printf("file already download %s\n", ming);
     jieshou_yd();  // 226
+
 }
 
 
 void shangchuan(const char* ming) {
+
+    if (!pasv_ok) {
+        printf("please start pasv \n");
+        return;
+    }
 
     FILE* ff = fopen(ming, "rb");
     if (!ff) {
@@ -165,7 +209,7 @@ void shangchuan(const char* ming) {
         return;
     }
 
-    fasong_ml("PASV\r\n");
+    
     char yd[HCHANG];
     int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
     yd[n] = '\0';
@@ -176,8 +220,12 @@ void shangchuan(const char* ming) {
     if (!jiexi_pasv(yd, ip, &dk)) { fclose(ff); return; }
     
 
-    int shuju = shuju_lianjie(ip, dk);
-    if (shuju < 0) { fclose(ff); return; }
+    int shuju = shuju_lianjie(pasv_ip, pasv_dk);
+    if (shuju < 0) {
+        fclose(ff);
+        pasv_ok = 0;
+        return;
+    }
     
 
     fasong_ml("STOR %s\r\n", ming);
@@ -200,6 +248,7 @@ void jiaohu() {
     char buf[HCHANG];
     
     printf("\nFTP \n");
+    printf("  pasv  \n");
     printf("  ls  \n");
     printf("  get\n");
     printf("  put \n");
@@ -214,7 +263,9 @@ void jiaohu() {
         int len = strlen(buf);
         if (len > 0 && buf[len-1] == '\n') buf[len-1] = '\0';
         
-        if (strncmp(buf, "ls", 2) == 0) {
+        if (strcmp(buf, "pasv") == 0) {
+            kaiqi_pasv();                  }
+        else if (strncmp(buf, "ls", 2) == 0) {
             liechu_mulu();
         }
         else if (strncmp(buf, "get ", 4) == 0) {
@@ -224,7 +275,7 @@ void jiaohu() {
             shangchuan(buf + 4);
         }
         else if (strncmp(buf, "cd ", 3) == 0) {
-            ml_yd(buf); 
+            ml_yd(buf);
         }
         else if (strcmp(buf, "pwd") == 0) {
             ml_yd("PWD");
@@ -234,9 +285,10 @@ void jiaohu() {
             break;
         }
         else {
-            printf("not know %s\n", buf);
+            printf("未知命令: %s\n", buf);
         }
     }
+    
 }
 
 int main(int argc,char*argv[]){
