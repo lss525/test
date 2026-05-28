@@ -279,6 +279,7 @@ void chuli_RETR(int sock, int shuju_sock, char* mulu, char* arg){
         return;
     }
     fclose(ff);
+    mingling_fasong(sock, "150 \r\n"); 
     Chuanshu_Canshu* cs=(Chuanshu_Canshu*)malloc(sizeof(Chuanshu_Canshu));
     cs->shuju_sock=shuju_sock;
     cs->leixing=1;
