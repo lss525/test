@@ -110,20 +110,7 @@ void liechu_mulu() {
         return;
     }
     
-   
-    
-    char yd[HCHANG];
-    int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
-    yd[n] = '\0';
-    printf("accept %s", yd);
-    
-
-    char ip[32];
-    int dk;
-    if (!jiexi_pasv(yd, ip, &dk)) {
-        printf("no PASV \n");
-        return;
-    }
+ 
 
     int shuju = shuju_lianjie(pasv_ip, pasv_dk);
     if (shuju < 0) {
@@ -134,14 +121,12 @@ void liechu_mulu() {
     jieshou_yd();  // 150
     
     char data[HCHANG];
-    n = recv(shuju, data, sizeof(data) - 1, 0);
+    int n = recv(shuju, data, sizeof(data) - 1, 0);
     if (n > 0) {
         data[n] = '\0';
         printf("%s", data);
-
     }
-    
-    
+
     close(shuju);
     pasv_ok = 0;  // ===== 新增：用完端口就失效 =====
     jieshou_yd(); // 226
@@ -154,14 +139,6 @@ void xiazai(const char* ming) {
         return;
     }
 
-    char yd[HCHANG];
-    int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
-    yd[n] = '\0';
-    printf("accept %s", yd);
-    
-    char ip[32];
-    int dk;
-    if (!jiexi_pasv(yd, ip, &dk)) return;
 
    int shuju = shuju_lianjie(pasv_ip, pasv_dk);
     if (shuju < 0) {
@@ -183,6 +160,7 @@ void xiazai(const char* ming) {
     }
     
     char buf[8192];
+    int n;
     while ((n = recv(shuju, buf, sizeof(buf), 0)) > 0) {
         fwrite(buf, 1, n, ff);
     }
@@ -211,16 +189,6 @@ void shangchuan(const char* ming) {
     }
 
     
-    char yd[HCHANG];
-    int n = recv(kongzhi_sock, yd, sizeof(yd) - 1, 0);
-    yd[n] = '\0';
-    printf("accept%s", yd);
-    
-    char ip[32];
-    int dk;
-    if (!jiexi_pasv(yd, ip, &dk)) { fclose(ff); return; }
-    
-
     int shuju = shuju_lianjie(pasv_ip, pasv_dk);
     if (shuju < 0) {
         fclose(ff);
@@ -233,6 +201,7 @@ void shangchuan(const char* ming) {
     jieshou_yd();  // 150
     
     char buf[8192];
+    int n;
     while ((n = fread(buf, 1, sizeof(buf), ff)) > 0) {
         send(shuju, buf, n, 0);
     }

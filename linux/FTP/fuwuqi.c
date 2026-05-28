@@ -263,7 +263,7 @@ void chuli_LIST(int sock,int shuju_sock,char* mulu){
     pthread_t tid;
     pthread_create(&tid, NULL, shuju_chuanshu, cs);
     pthread_detach(tid);
-    sleep(1);
+    sleep(3);
     mingling_fasong(sock,"226 mulu put\r\n");
 
 
@@ -273,6 +273,11 @@ void chuli_RETR(int sock, int shuju_sock, char* mulu, char* arg){
     char fp[512];
     snprintf(fp, sizeof(fp), "%s%s/%s", GENMULU, mulu, arg);
     FILE* ff=fopen(fp,"rb");
+    if (!ff) {
+        mingling_fasong(sock, "550 文件不存在\r\n");
+        close(shuju_sock);
+        return;
+    }
     fclose(ff);
     Chuanshu_Canshu* cs=(Chuanshu_Canshu*)malloc(sizeof(Chuanshu_Canshu));
     cs->shuju_sock=shuju_sock;
@@ -410,8 +415,9 @@ int main(int argc,char*argv[]){
         fclose(f);
     }
     snprintf(fp,sizeof(fp),"%s/test.txt",GENMULU);
-    fopen(fp,"w");
+    f=fopen(fp,"w");
     if(f){
+        fprintf(f,"test file");
         fclose(f);
     }
     
