@@ -1,0 +1,4 @@
+/home/lighning/codes/test/linux/聊天室/build/CMakeFiles/chat_server.dir
+/home/lighning/codes/test/linux/聊天室/build/CMakeFiles/chat_client.dir
+/home/lighning/codes/test/linux/聊天室/build/CMakeFiles/edit_cache.dir
+/home/lighning/codes/test/linux/聊天室/build/CMakeFiles/rebuild_cache.dir
