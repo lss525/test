@@ -1,5 +1,0 @@
-[2026-08-18 10:25:44.398] [chat] [info] Server starting on 0.0.0.0:8888
-[2026-08-18 10:25:44.741] [chat] [info] Server initialized
-[2026-08-18 10:25:46.601] [chat] [info] New connection fd=40
-[2026-08-18 10:26:05.179] [chat] [info] Signal 2 received, shutting down
-[2026-08-18 10:26:06.098] [chat] [info] Server stopped

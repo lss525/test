@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/chat_client.dir/client/main.cpp.o CMakeFiles/chat_client.dir/client/client.cpp.o CMakeFiles/chat_client.dir/common/crypto.cpp.o -o chat_client  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so 
