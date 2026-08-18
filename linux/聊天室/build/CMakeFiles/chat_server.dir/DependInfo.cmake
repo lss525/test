@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/lighning/codes/test/linux/聊天室/common/config.cpp" "CMakeFiles/chat_server.dir/common/config.cpp.o" "gcc" "CMakeFiles/chat_server.dir/common/config.cpp.o.d"
   "/home/lighning/codes/test/linux/聊天室/common/crypto.cpp" "CMakeFiles/chat_server.dir/common/crypto.cpp.o" "gcc" "CMakeFiles/chat_server.dir/common/crypto.cpp.o.d"
   "/home/lighning/codes/test/linux/聊天室/common/email.cpp" "CMakeFiles/chat_server.dir/common/email.cpp.o" "gcc" "CMakeFiles/chat_server.dir/common/email.cpp.o.d"
   "/home/lighning/codes/test/linux/聊天室/database/mysql_pool.cpp" "CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o" "gcc" "CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o.d"

@@ -190,6 +190,30 @@ client/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/chat_client.dir/build.make CMakeFiles/chat_client.dir/client/main.cpp.s
 .PHONY : client/main.cpp.s
 
+common/config.o: common/config.cpp.o
+.PHONY : common/config.o
+
+# target to build an object file
+common/config.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chat_server.dir/build.make CMakeFiles/chat_server.dir/common/config.cpp.o
+.PHONY : common/config.cpp.o
+
+common/config.i: common/config.cpp.i
+.PHONY : common/config.i
+
+# target to preprocess a source file
+common/config.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chat_server.dir/build.make CMakeFiles/chat_server.dir/common/config.cpp.i
+.PHONY : common/config.cpp.i
+
+common/config.s: common/config.cpp.s
+.PHONY : common/config.s
+
+# target to generate assembly for a file
+common/config.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chat_server.dir/build.make CMakeFiles/chat_server.dir/common/config.cpp.s
+.PHONY : common/config.cpp.s
+
 common/crypto.o: common/crypto.cpp.o
 .PHONY : common/crypto.o
 
@@ -425,6 +449,9 @@ help:
 	@echo "... client/main.o"
 	@echo "... client/main.i"
 	@echo "... client/main.s"
+	@echo "... common/config.o"
+	@echo "... common/config.i"
+	@echo "... common/config.s"
 	@echo "... common/crypto.o"
 	@echo "... common/crypto.i"
 	@echo "... common/crypto.s"

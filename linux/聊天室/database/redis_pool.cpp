@@ -1,6 +1,7 @@
-#include "/home/lighning/codes/test/linux/聊天室/include/datebase/redis_pool.h"
+#include "../include/datebase/redis_pool.h"
 #include <stdexcept>
 #include <cstring>
+#include <chrono>
 
 namespace chat {
 
@@ -30,7 +31,11 @@ redisContext* RedisPool::create_connection() {
 
 redisContext* RedisPool::acquire() {
     std::unique_lock<std::mutex> lock(mutex_);
-    cv_.wait(lock, [this] { return !pool_.empty(); });
+    // 带超时等待，防止连接池耗尽时 worker 无限阻塞
+    if (!cv_.wait_for(lock, std::chrono::seconds(5),
+                      [this] { return !pool_.empty(); })) {
+        throw std::runtime_error("RedisPool: acquire timeout");
+    }
     redisContext* c = pool_.front(); pool_.pop();
     return c;
 }

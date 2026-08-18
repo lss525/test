@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/chat_server.dir/common/config.cpp.o"
+  "CMakeFiles/chat_server.dir/common/config.cpp.o.d"
   "CMakeFiles/chat_server.dir/common/crypto.cpp.o"
   "CMakeFiles/chat_server.dir/common/crypto.cpp.o.d"
   "CMakeFiles/chat_server.dir/common/email.cpp.o"

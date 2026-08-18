@@ -1,7 +1,7 @@
 CMakeFiles/chat_server.dir/server/connection.cpp.o: \
  /home/lighning/codes/test/linux/聊天室/server/connection.cpp \
  /usr/include/stdc-predef.h \
- /home/lighning/codes/test/linux/聊天室/include/server/connection.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/connection.h \
  /usr/include/c++/13/string /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -168,12 +168,12 @@ CMakeFiles/chat_server.dir/server/connection.cpp.o: \
  /usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h \
  /usr/include/c++/13/bits/std_mutex.h \
  /usr/include/c++/13/bits/unique_lock.h \
- /home/lighning/codes/test/linux/聊天室/include/common/user.h \
- /home/lighning/codes/test/linux/聊天室/include/common/message.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/../common/user.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/../common/message.h \
  /usr/include/c++/13/cstring /usr/include/string.h /usr/include/strings.h \
  /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
  /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
- /home/lighning/codes/test/linux/聊天室/include/server/reactor.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/reactor.h \
  /usr/include/x86_64-linux-gnu/sys/epoll.h \
  /usr/include/x86_64-linux-gnu/bits/epoll.h /usr/include/c++/13/atomic \
  /usr/include/c++/13/thread /usr/include/c++/13/bits/std_thread.h \
@@ -200,10 +200,10 @@ CMakeFiles/chat_server.dir/server/connection.cpp.o: \
  /usr/include/c++/13/bits/stl_algo.h \
  /usr/include/c++/13/bits/algorithmfwd.h \
  /usr/include/c++/13/bits/uniform_int_dist.h \
- /home/lighning/codes/test/linux/聊天室/include/server/server.h \
- /home/lighning/codes/test/linux/聊天室/include/server/reactor.h \
- /home/lighning/codes/test/linux/聊天室/include/server/connection.h \
- /home/lighning/codes/test/linux/聊天室/include/datebase/mysql_pool.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/server.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/reactor.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/connection.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/../datebase/mysql_pool.h \
  /usr/include/mysql/mysql.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h \
  /usr/include/mysql/field_types.h /usr/include/mysql/my_list.h \
@@ -214,11 +214,11 @@ CMakeFiles/chat_server.dir/server/connection.cpp.o: \
  /usr/include/mysql/plugin_auth_common.h \
  /usr/include/mysql/mysql_version.h /usr/include/mysql/mysql_time.h \
  /usr/include/mysql/errmsg.h \
- /home/lighning/codes/test/linux/聊天室/include/datebase/redis_pool.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/../datebase/redis_pool.h \
  /usr/include/hiredis/hiredis.h /usr/include/hiredis/read.h \
  /usr/include/x86_64-linux-gnu/sys/time.h /usr/include/hiredis/sds.h \
  /usr/include/hiredis/alloc.h \
- /home/lighning/codes/test/linux/聊天室/include/server/logger.h \
+ /home/lighning/codes/test/linux/聊天室/server/../include/server/logger.h \
  /usr/include/spdlog/spdlog.h /usr/include/spdlog/common.h \
  /usr/include/spdlog/tweakme.h /usr/include/spdlog/details/null_mutex.h \
  /usr/include/c++/13/utility /usr/include/c++/13/bits/stl_relops.h \
@@ -319,4 +319,33 @@ CMakeFiles/chat_server.dir/server/connection.cpp.o: \
  /usr/include/x86_64-linux-gnu/asm/sockios.h \
  /usr/include/asm-generic/sockios.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
- /usr/include/x86_64-linux-gnu/bits/socket2.h
+ /usr/include/x86_64-linux-gnu/bits/socket2.h \
+ /usr/include/x86_64-linux-gnu/sys/mman.h \
+ /usr/include/x86_64-linux-gnu/bits/mman.h \
+ /usr/include/x86_64-linux-gnu/bits/mman-map-flags-generic.h \
+ /usr/include/x86_64-linux-gnu/bits/mman-linux.h \
+ /usr/include/x86_64-linux-gnu/bits/mman-shared.h \
+ /usr/include/x86_64-linux-gnu/bits/mman_ext.h /usr/include/openssl/sha.h \
+ /usr/include/openssl/macros.h \
+ /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
+ /usr/include/x86_64-linux-gnu/openssl/configuration.h \
+ /usr/include/openssl/opensslv.h /usr/include/openssl/e_os2.h \
+ /usr/include/openssl/bio.h /usr/include/openssl/crypto.h \
+ /usr/include/openssl/safestack.h /usr/include/openssl/stack.h \
+ /usr/include/openssl/types.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
+ /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+ /usr/include/linux/limits.h \
+ /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
+ /usr/include/openssl/cryptoerr.h /usr/include/openssl/symhacks.h \
+ /usr/include/openssl/cryptoerr_legacy.h /usr/include/openssl/core.h \
+ /usr/include/openssl/bioerr.h /usr/include/openssl/evp.h \
+ /usr/include/openssl/core_dispatch.h /usr/include/openssl/evperr.h \
+ /usr/include/openssl/params.h /usr/include/openssl/bn.h \
+ /usr/include/openssl/bnerr.h /usr/include/openssl/objects.h \
+ /usr/include/openssl/obj_mac.h /usr/include/openssl/asn1.h \
+ /usr/include/openssl/asn1err.h /usr/include/openssl/objectserr.h

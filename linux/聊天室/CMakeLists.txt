@@ -14,15 +14,16 @@ pkg_check_modules(HIREDIS REQUIRED hiredis)
 pkg_check_modules(SPDLOG spdlog)
 pkg_check_modules(CURL REQUIRED libcurl)
 add_executable(chat_server
-    /home/lighning/codes/test/linux/聊天室/server/main.cpp
-    /home/lighning/codes/test/linux/聊天室/server/server.cpp
-    /home/lighning/codes/test/linux/聊天室/server/reactor.cpp
-    /home/lighning/codes/test/linux/聊天室/server/connection.cpp
-    /home/lighning/codes/test/linux/聊天室/server/logger.cpp
-    /home/lighning/codes/test/linux/聊天室/common/crypto.cpp
-    /home/lighning/codes/test/linux/聊天室/database/mysql_pool.cpp
-    /home/lighning/codes/test/linux/聊天室/common/email.cpp  
-    /home/lighning/codes/test/linux/聊天室/database/redis_pool.cpp
+    server/main.cpp
+    server/server.cpp
+    server/reactor.cpp
+    server/connection.cpp
+    server/logger.cpp
+    common/crypto.cpp
+    common/config.cpp
+    database/mysql_pool.cpp
+    common/email.cpp
+    database/redis_pool.cpp
 )
 
 target_include_directories(chat_server PRIVATE 
@@ -56,9 +57,9 @@ if(SPDLOG_FOUND)
 endif()
 
 add_executable(chat_client
-    /home/lighning/codes/test/linux/聊天室/client/main.cpp
-    /home/lighning/codes/test/linux/聊天室/client/client.cpp
-    /home/lighning/codes/test/linux/聊天室/common/crypto.cpp
+    client/main.cpp
+    client/client.cpp
+    common/crypto.cpp
 )
 
 target_include_directories(chat_client PRIVATE include)

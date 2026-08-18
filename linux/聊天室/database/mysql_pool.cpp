@@ -1,5 +1,6 @@
-#include "/home/lighning/codes/test/linux/聊天室/include/datebase/mysql_pool.h"
+#include "../include/datebase/mysql_pool.h"
 #include <stdexcept>
+#include <chrono>
 
 namespace chat {
 
@@ -25,7 +26,11 @@ MYSQL* MySQLPool::create_connection() {
 
 MYSQL* MySQLPool::acquire() {
     std::unique_lock<std::mutex> lock(mutex_);
-    cv_.wait(lock, [this] { return !pool_.empty(); });
+    // 带超时等待，防止连接池耗尽时 worker 无限阻塞
+    if (!cv_.wait_for(lock, std::chrono::seconds(5),
+                      [this] { return !pool_.empty(); })) {
+        throw std::runtime_error("MySQLPool: acquire timeout");
+    }
     MYSQL* conn = pool_.front(); pool_.pop();
     return conn;
 }

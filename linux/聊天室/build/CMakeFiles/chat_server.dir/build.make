@@ -153,10 +153,24 @@ CMakeFiles/chat_server.dir/common/crypto.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chat_server.dir/common/crypto.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lighning/codes/test/linux/聊天室/common/crypto.cpp -o CMakeFiles/chat_server.dir/common/crypto.cpp.s
 
+CMakeFiles/chat_server.dir/common/config.cpp.o: CMakeFiles/chat_server.dir/flags.make
+CMakeFiles/chat_server.dir/common/config.cpp.o: /home/lighning/codes/test/linux/聊天室/common/config.cpp
+CMakeFiles/chat_server.dir/common/config.cpp.o: CMakeFiles/chat_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/chat_server.dir/common/config.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chat_server.dir/common/config.cpp.o -MF CMakeFiles/chat_server.dir/common/config.cpp.o.d -o CMakeFiles/chat_server.dir/common/config.cpp.o -c /home/lighning/codes/test/linux/聊天室/common/config.cpp
+
+CMakeFiles/chat_server.dir/common/config.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/chat_server.dir/common/config.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lighning/codes/test/linux/聊天室/common/config.cpp > CMakeFiles/chat_server.dir/common/config.cpp.i
+
+CMakeFiles/chat_server.dir/common/config.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chat_server.dir/common/config.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lighning/codes/test/linux/聊天室/common/config.cpp -o CMakeFiles/chat_server.dir/common/config.cpp.s
+
 CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o: CMakeFiles/chat_server.dir/flags.make
 CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o: /home/lighning/codes/test/linux/聊天室/database/mysql_pool.cpp
 CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o: CMakeFiles/chat_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o -MF CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o.d -o CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o -c /home/lighning/codes/test/linux/聊天室/database/mysql_pool.cpp
 
 CMakeFiles/chat_server.dir/database/mysql_pool.cpp.i: cmake_force
@@ -170,7 +184,7 @@ CMakeFiles/chat_server.dir/database/mysql_pool.cpp.s: cmake_force
 CMakeFiles/chat_server.dir/common/email.cpp.o: CMakeFiles/chat_server.dir/flags.make
 CMakeFiles/chat_server.dir/common/email.cpp.o: /home/lighning/codes/test/linux/聊天室/common/email.cpp
 CMakeFiles/chat_server.dir/common/email.cpp.o: CMakeFiles/chat_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/chat_server.dir/common/email.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/chat_server.dir/common/email.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chat_server.dir/common/email.cpp.o -MF CMakeFiles/chat_server.dir/common/email.cpp.o.d -o CMakeFiles/chat_server.dir/common/email.cpp.o -c /home/lighning/codes/test/linux/聊天室/common/email.cpp
 
 CMakeFiles/chat_server.dir/common/email.cpp.i: cmake_force
@@ -184,7 +198,7 @@ CMakeFiles/chat_server.dir/common/email.cpp.s: cmake_force
 CMakeFiles/chat_server.dir/database/redis_pool.cpp.o: CMakeFiles/chat_server.dir/flags.make
 CMakeFiles/chat_server.dir/database/redis_pool.cpp.o: /home/lighning/codes/test/linux/聊天室/database/redis_pool.cpp
 CMakeFiles/chat_server.dir/database/redis_pool.cpp.o: CMakeFiles/chat_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/chat_server.dir/database/redis_pool.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/chat_server.dir/database/redis_pool.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chat_server.dir/database/redis_pool.cpp.o -MF CMakeFiles/chat_server.dir/database/redis_pool.cpp.o.d -o CMakeFiles/chat_server.dir/database/redis_pool.cpp.o -c /home/lighning/codes/test/linux/聊天室/database/redis_pool.cpp
 
 CMakeFiles/chat_server.dir/database/redis_pool.cpp.i: cmake_force
@@ -203,6 +217,7 @@ chat_server_OBJECTS = \
 "CMakeFiles/chat_server.dir/server/connection.cpp.o" \
 "CMakeFiles/chat_server.dir/server/logger.cpp.o" \
 "CMakeFiles/chat_server.dir/common/crypto.cpp.o" \
+"CMakeFiles/chat_server.dir/common/config.cpp.o" \
 "CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o" \
 "CMakeFiles/chat_server.dir/common/email.cpp.o" \
 "CMakeFiles/chat_server.dir/database/redis_pool.cpp.o"
@@ -216,6 +231,7 @@ chat_server: CMakeFiles/chat_server.dir/server/reactor.cpp.o
 chat_server: CMakeFiles/chat_server.dir/server/connection.cpp.o
 chat_server: CMakeFiles/chat_server.dir/server/logger.cpp.o
 chat_server: CMakeFiles/chat_server.dir/common/crypto.cpp.o
+chat_server: CMakeFiles/chat_server.dir/common/config.cpp.o
 chat_server: CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o
 chat_server: CMakeFiles/chat_server.dir/common/email.cpp.o
 chat_server: CMakeFiles/chat_server.dir/database/redis_pool.cpp.o
@@ -223,7 +239,7 @@ chat_server: CMakeFiles/chat_server.dir/build.make
 chat_server: /usr/lib/x86_64-linux-gnu/libssl.so
 chat_server: /usr/lib/x86_64-linux-gnu/libcrypto.so
 chat_server: CMakeFiles/chat_server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable chat_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lighning/codes/test/linux/聊天室/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable chat_server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/chat_server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -1,7 +1,7 @@
 CMakeFiles/chat_client.dir/common/crypto.cpp.o: \
  /home/lighning/codes/test/linux/聊天室/common/crypto.cpp \
  /usr/include/stdc-predef.h \
- /home/lighning/codes/test/linux/聊天室/include/common/crypto.h \
+ /home/lighning/codes/test/linux/聊天室/common/../include/common/crypto.h \
  /usr/include/c++/13/string /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \

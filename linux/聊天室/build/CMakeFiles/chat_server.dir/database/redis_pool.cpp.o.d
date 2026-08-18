@@ -1,7 +1,7 @@
 CMakeFiles/chat_server.dir/database/redis_pool.cpp.o: \
  /home/lighning/codes/test/linux/聊天室/database/redis_pool.cpp \
  /usr/include/stdc-predef.h \
- /home/lighning/codes/test/linux/聊天室/include/datebase/redis_pool.h \
+ /home/lighning/codes/test/linux/聊天室/database/../include/datebase/redis_pool.h \
  /usr/include/hiredis/hiredis.h /usr/include/hiredis/read.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \

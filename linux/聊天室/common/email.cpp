@@ -1,4 +1,5 @@
-#include "/home/lighning/codes/test/linux/聊天室/include/common/email.h"
+#include "../include/common/email.h"
+#include "../include/common/config.h"
 #include <curl/curl.h>
 #include <cstdio>
 #include <cstring>
@@ -26,8 +27,8 @@ bool EmailSender::send_code(const std::string& to, const std::string& code) {
     CURL* curl = curl_easy_init();
     if (!curl) return false;
 
-    std::string from = "1282852660@qq.com";
-    std::string password = "qjfejbrxnqtsfhbj";
+    std::string from = Config::get("smtp.user");
+    std::string password = Config::get("smtp.password");
     std::string body = "From: " + from + "\r\n"
                        "To: " + to + "\r\n"
                        "Subject: 聊天室验证码\r\n"

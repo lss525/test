@@ -1,7 +1,9 @@
-#include "/home/lighning/codes/test/linux/聊天室/include/server/server.h"
-#include "/home/lighning/codes/test/linux/聊天室/include/server/logger.h"
+#include "../include/server/server.h"
+#include "../include/server/logger.h"
+#include "../include/common/config.h"
 #include <iostream>
 #include <csignal>
+
 
 chat::Server* g_server = nullptr;
 
@@ -13,6 +15,7 @@ void signal_handler(int sig) {
 }
 
 int main(int argc, char* argv[]) {
+
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <port> [bind_address]" << std::endl;
         return 1;
@@ -23,6 +26,14 @@ int main(int argc, char* argv[]) {
 
     chat::Logger::init("chat_server.log");
     LOG_INFO("Server starting on {}:{}", address, port);
+
+    // 加载配置文件（密码/授权码从 config.ini 读取，不写死在代码里）
+    std::string config_path = argc > 3 ? argv[3] : "";
+    if (!config_path.empty()) {
+        chat::Config::load(config_path);
+    } else if (!chat::Config::load("config.ini") && !chat::Config::load("../config.ini")) {
+        LOG_WARN("未找到 config.ini，数据库/邮箱将使用默认或空配置");
+    }
 
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);

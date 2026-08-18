@@ -1,4 +1,4 @@
-#include "/home/lighning/codes/test/linux/聊天室/include/common/crypto.h"
+#include "../include/common/crypto.h"
 #include <openssl/sha.h>
 #include <openssl/rand.h>
 #include <sstream>
@@ -29,4 +29,13 @@ std::string Crypto::generate_verify_code(int length) {
     return code;
 }
 
-} 
+std::string Crypto::generate_transfer_id() {
+    unsigned char buf[16];
+    RAND_bytes(buf, sizeof(buf));
+    std::stringstream ss;
+    for (int i = 0; i < 16; i++)
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)buf[i];
+    return ss.str();
+}
+
+} // namespace chat

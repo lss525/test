@@ -1,4 +1,4 @@
-
+#ifndef CHAT_CRYPTO_H
 #define CHAT_CRYPTO_H
 
 #include <string>
@@ -10,6 +10,9 @@ public:
     static std::string hash_password(const std::string& password);
     static bool verify_password(const std::string& password, const std::string& hash);
     static std::string generate_verify_code(int length = 6);
+    static std::string generate_transfer_id();
 };
 
 } // namespace chat
+
+#endif

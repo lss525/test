@@ -1,7 +1,7 @@
 CMakeFiles/chat_server.dir/database/mysql_pool.cpp.o: \
  /home/lighning/codes/test/linux/聊天室/database/mysql_pool.cpp \
  /usr/include/stdc-predef.h \
- /home/lighning/codes/test/linux/聊天室/include/datebase/mysql_pool.h \
+ /home/lighning/codes/test/linux/聊天室/database/../include/datebase/mysql_pool.h \
  /usr/include/mysql/mysql.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
